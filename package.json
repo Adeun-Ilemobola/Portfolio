@@ -4,12 +4,11 @@
   "type": "module",
   "private": true,
  "scripts": {
-  "dev": "concurrently \"bun run build-frontend && bun run watch\" \"bun --hot --watch src/index.ts\"",
-  "watch": "chokidar 'frontend/src/**/*' -c 'bun run rebuild-frontend'",
+  "dev": "concurrently \"bun run rebuild-frontend\" \"bun --hot --watch src/index.ts\"",
   "build-frontend": "cd frontend && bunx vite build",
-  "rebuild-frontend": "cd frontend && bunx vite build",
+  "rebuild-frontend": "cd frontend && bunx vite build --watch",
   "build": "bun run build-frontend",
-  "start": "bun run build && bun src/index.ts"
+  "start": "bun src/index.ts"
 },
   "devDependencies": {
     "@types/bun": "^1.2.5",

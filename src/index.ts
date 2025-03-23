@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { logger } from 'hono/logger';
+import { join } from 'path' 
 
 const app = new Hono();
 
@@ -20,11 +21,13 @@ const apiRoutes = app.basePath('/api')
 app.use('*', serveStatic({ root: './frontend/dist' }));
 app.use('*', serveStatic({ path: './frontend/dist/index.html' }));
 
-// Start server
-Bun.serve({
-     port: 3000,
-     fetch: app.fetch,
 
+const port = Number(process.env.PORT || 3000)
+Bun.serve({
+  hostname: '0.0.0.0',
+  port,
+  fetch: app.fetch,
 })
-console.log("Server is listening at http://localhost:3000"); 
+
+console.log(`Server is listening at http://localhost:${port}`)
 export type APIRoutes = typeof apiRoutes;

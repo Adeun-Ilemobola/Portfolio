@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button'
 import UtilityCard from '@/components/utilityCard'
-import {  SiMailboxdotorg, SiGithub } from '@icons-pack/react-simple-icons';
+import { SiMailboxdotorg, SiGithub } from '@icons-pack/react-simple-icons';
 import AnimatedTechnologies from '@/components/AnimatedTechnologies';
 import WaveBorderWrapper from '@/components/GradientBorderWrapper';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { useState } from 'react';
 
 
 const Contact = [
@@ -15,6 +16,7 @@ const Contact = [
 
 
 export default function Home() {
+     const [showContact, setShowContact] = useState(false)
      return (
           <div className=' min-w-full h-[800px]   '>
                {/* grid root */}
@@ -35,11 +37,18 @@ export default function Home() {
 
                     </div>
                     {/* About me */}
-                    <div className=' col-start-3 col-end-6 row-start-1 row-end-3  ring ring-amber-800 rounded-sm p-0.5'>
+                    <div className=' flex flex-col gap-2 col-start-3 col-end-6 row-start-1 row-end-3 p-3  ring ring-amber-800 rounded-sm '>
+                         <h2 className='text-2xl font-bold'>About Me</h2>
+                         <p className='text-xl'>
+                              I am a dedicated and adaptable professional with a passion for technology, multimedia, and problem-solving. With a strong foundation in JavaScript, TypeScript, CSS, and HTML, I have experience developing web applications using React, Next.js, and Prisma (ORM). My technical proficiency extends to MS Word, Excel, Photoshop, and Lightroom, complementing my ability to work in multimedia, including photography, videography, and audiovisual operations.
+
+                              Currently studying at Douglas College, I am continuously expanding my knowledge in game development and web technologies. Beyond my technical expertise, I thrive in team collaborations, communicate effectively with diverse audiences, and take pride in my strong work ethic and ability to work independently.
+                         </p>
+                         <p className='text-xl'> 🔗 Let's connect and create something impactful together!</p>
 
                     </div>
                     {/* Technologies that I know */}
-                    <div className=' flex flex-col gap-3 col-start-3 col-end-6 row-start-3 row-end-6 ring ring-emerald-500 overflow-hidden rounded-sm p-2'>
+                    <div className=' flex flex-col gap-1 col-start-3 col-end-6 row-start-3 row-end-6 ring ring-emerald-500 overflow-hidden rounded-sm p-2'>
 
 
                          <div className=" relative w-full  flex flex-col   ">
@@ -64,51 +73,71 @@ export default function Home() {
 
 
 
+                         {showContact ?
+                              <>
 
-                         <form className=' flex gap-5 flex-col h-full justify-center  '>
+                                   <form className=' flex gap-3 flex-col h-full justify-center  '>
 
-                              <div className=' flex gap-2  flex-row h-5/6 '>
-                                   <div className=' flex flex-col gap-1.5 h-full justify-center w-[28%]'>
+                                        <div className=' flex gap-1  flex-col justify-center items-center  '>
+                                             <div className=' flex flex-row gap-6 h-full justify-center w-full'>
 
-                                        <div className='flex flex-col gap-1.5'>
-                                             <Label className='text-sm font-medium text-gray-200 ' htmlFor='name'>
-                                                  <span className=' text-red-500/60'>*<span className='text-gray-200'>Name:</span> </span>
-                                             </Label>
-                                             <Input type="text" id='name' name='name' required className='ring-1 ring-gray-500 block  text-gray-400 ' />
+                                                  <div className='flex flex-col gap-1.5 w-[30%]'>
+                                                       <Label className='text-sm font-medium text-gray-200 ' htmlFor='name'>
+                                                            <span className=' text-red-500/60'>*<span className='text-gray-200'>Name:</span> </span>
+                                                       </Label>
+                                                       <Input type="text" id='name' name='name' required className='ring-1 ring-gray-500 block  text-gray-400 ' />
+
+                                                  </div>
+                                                  <div className='flex flex-col gap-1.5 w-[30%]'>
+                                                       <Label className='text-sm font-medium text-gray-200 ' htmlFor='email'>
+                                                            <span className=' text-red-500/60'>*<span className='text-gray-200'>Email:</span> </span>
+
+                                                       </Label>
+                                                       <Input type='email' id='email' name='email' required className='ring-1 ring-gray-500 block  text-gray-400 ' />
+
+                                                  </div>
+
+
+
+
+                                             </div>
+
+                                             <div className='flex flex-col gap-1.5  flex-1 w-[90%]'>
+                                                  <Label className='text-sm font-medium text-gray-200 ' htmlFor='message'>
+                                                       <span className=' text-red-500/60'>*<span className='text-gray-200'>Message:</span> </span>
+
+                                                  </Label>
+                                                  <textarea id='message' name='message' required className=' h-28 ring-1 ring-gray-500   text-gray-400 resize-none p-1.5  ' />
+                                             </div>
 
                                         </div>
-                                        <div className='flex flex-col gap-1.5'>
-                                             <Label className='text-sm font-medium text-gray-200 ' htmlFor='email'>
-                                                  <span className=' text-red-500/60'>*<span className='text-gray-200'>Email:</span> </span>
 
-                                             </Label>
-                                             <Input type='email' id='email' name='email' required className='ring-1 ring-gray-500 block  text-gray-400 ' />
-
+                                        <div className=' flex flex-row justify-center items-center gap-3 '>
+                                             <Button className='text-white bg-gradient-to-r from-indigo-600 to-blue-400 hover:from-pink-500 hover:to-purple-700' type='submit'>Submit</Button>
                                         </div>
 
 
 
 
+                                   </form>
+                              </>
+
+                              :
+                              <>
+                                   <div className='flex flex-row gap-2 justify-center items-center h-full '>
+                                        <Button onClick={() => setShowContact(!showContact)}>
+                                             Contact me by email Through the website
+                                        </Button>
                                    </div>
 
-                                   <div className='flex flex-col gap-1.5 h-full flex-1 w-[60%]'>
-                                        <Label className='text-sm font-medium text-gray-200 ' htmlFor='message'>
-                                             <span className=' text-red-500/60'>*<span className='text-gray-200'>Message:</span> </span>
+                              </>
 
-                                        </Label>
-                                        <textarea id='message' name='message' required className=' h-full ring-1 ring-gray-500   text-gray-400 resize-none p-1.5  ' />
-                                   </div>
 
-                              </div>
-
-                              <div className=' flex flex-row justify-center items-center gap-3 '>
-                                   <Button className='text-white bg-gradient-to-r from-indigo-600 to-blue-400 hover:from-pink-500 hover:to-purple-700' type='submit'>Submit</Button>
-                              </div>
+                         }
 
 
 
 
-                         </form>
 
 
 

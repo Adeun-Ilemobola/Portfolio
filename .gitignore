@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+
+# Build output (both frontend and backend)
+dist/
+frontend/dist/
+out/
+dist-ssr/
+*.tgz
+
+# Code coverage
+coverage/
+*.lcov
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Environment variables
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Cache files
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# Editor & IDE files
+.idea/
+.vscode/
+!.vscode/extensions.json
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS-specific files
+Thumbs.db
+Desktop.ini
+
+# Lock files (optional, depending on your package manager)
+bun.lockb
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# TypeScript build artifacts
+*.tsbuildinfo
+*.d.ts
+*.map
+
+# Vite-specific files (for frontend)
+frontend/.vite/
+
+# Public directory (optional if you have generated files inside)
+frontend/public/build/
+frontend/public/assets/
+
+# Ignore duplicate `.gitignore` in subdirectories
+frontend/src/.gitignore
+server/src/.gitignore

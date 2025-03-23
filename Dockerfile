@@ -1,22 +1,20 @@
-# 1. Base image with Bun installed
 FROM oven/bun:latest
 
-# 2. Create app directory in container
 WORKDIR /app
 
-# 3. Copy everything into /app
 COPY . .
 
-# 4. Install dependencies (root package.json)
+# Install root dependencies
 RUN bun install
 
-# 5. Build the frontend. 
-#    Either run the front-end script from root:
-RUN bun run build-frontend 
-#    OR run: RUN cd frontend && bun run build  (depends on where "build" script lives)
+# Explicitly install frontend dependencies
+RUN cd frontend && bun install
 
-# 6. Expose the port (for local Docker usage; many hosts ignore EXPOSE though)
+# Build frontend
+RUN cd frontend && bun run build
+
+# Expose port
 EXPOSE 3000
 
-# 7. Start your Bun server 
+# Start backend
 CMD ["bun", "run", "start"]

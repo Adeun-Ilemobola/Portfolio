@@ -1,21 +1,22 @@
-# Dockerfile
+# 1. Base image with Bun installed
 FROM oven/bun:latest
 
-# Create a folder for your app
+# 2. Create app directory in container
 WORKDIR /app
 
-# Copy all source files into the container
-# (Make sure you have a proper .dockerignore so you don’t copy node_modules, etc.)
+# 3. Copy everything into /app
 COPY . .
 
-# Install dependencies (this will run `bun install`)
+# 4. Install dependencies (root package.json)
 RUN bun install
 
-# Build the frontend (Vite)
-RUN cd frontend && bun run build
+# 5. Build the frontend. 
+#    Either run the front-end script from root:
+RUN bun run build-frontend 
+#    OR run: RUN cd frontend && bun run build  (depends on where "build" script lives)
 
-# Expose the port (for local Docker usage; some PaaS don’t rely on EXPOSE though)
+# 6. Expose the port (for local Docker usage; many hosts ignore EXPOSE though)
 EXPOSE 3000
 
-# Start the server (the script we defined in package.json)
+# 7. Start your Bun server 
 CMD ["bun", "run", "start"]

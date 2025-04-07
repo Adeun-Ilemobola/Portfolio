@@ -1,27 +1,12 @@
 {
   "name": "portfolio",
-  "module": "src/index.ts",
+  "module": "index.ts",
   "type": "module",
   "private": true,
- "scripts": {
-  "dev": "concurrently \"bun run rebuild-frontend\" \"bun --hot --watch src/index.ts\"",
-  "build-frontend": "cd frontend && bunx vite build",
-  "rebuild-frontend": "cd frontend && bunx vite build --watch",
-  "build": "bun run build-frontend",
-  "start": "bun src/index.ts"
-},
   "devDependencies": {
-    "@types/bun": "^1.2.5",
-    "@types/node": "^22.13.10",
-    "chokidar-cli": "^3.0.0",
-    "concurrently": "^9.1.2"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
-  },
-  "dependencies": {
-    "@hono/zod-validator": "^0.4.3",
-    "hono": "^4.7.4",
-    "zod": "^3.24.2"
   }
 }

@@ -3,10 +3,11 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), ],
   root: './', // Root directory for Vite
   build: {
     outDir: 'dist', // Build output folder

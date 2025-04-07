@@ -70,3 +70,4 @@ frontend/public/assets/
 # Ignore duplicate `.gitignore` in subdirectories
 frontend/src/.gitignore
 server/src/.gitignore
+

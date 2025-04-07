@@ -1,9 +1,10 @@
-import { type APIRoutes } from "@server/src/index";
+import { hc } from 'hono/client';
+import {type APIRoutes } from '@server/index'
 
-import { hc } from "hono/client";
+const client = hc<APIRoutes>('/');
+ type Client = typeof client
 
-// Create client instance to fetch API endpoints from server
-const client = hc<APIRoutes>('/')
+const hcWithType = (...args: Parameters<typeof hc>): Client =>
+  hc<APIRoutes>(...args)
 
-
-export const  api = client.api
+const api = hcWithType;

@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import { api } from './lib/api';
-import { motion } from "framer-motion";
-import GradientBorderWrapper from './components/GradientBorderWrapper';
-import Home from './Page/Home';
+import { api } from '../lib/api';
+import Home from '../View/Home';
+import {  createRoute } from '@tanstack/react-router'
+import RootRoute from '@/lib/routeConfig/rootRoute';
 
-function App() {
+function Index() {
   const [data, setData] = useState<{ message: string; timestamp: string } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const Res = await api.test.$get();
-      const Data = await Res.json();
-      setData(Data);
+      const Res = await api.
+      console.log(Res);
+    
     };
 
     fetchData();
@@ -30,4 +30,10 @@ function App() {
   );
 }
 
-export default App;
+const IndexRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: '/',
+  component: Index
+})
+
+export default IndexRoute;

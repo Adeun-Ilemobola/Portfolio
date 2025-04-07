@@ -1,0 +1,48 @@
+###############################################################################
+# compose.yaml – dev stack with:                                              #
+#  ▸ Front‑end  ➜  vite build --watch  ➜  /app/dist (volume)                  #
+#  ▸ Back‑end   ➜  hono  +  serves /app/frontend/dist from the same volume    #
+#  ▸ Hot reload for both sides, one command: docker compose up                #
+###############################################################################
+
+services:
+  # ─────────────────────────── API (Hono + Bun) ────────────────────────────
+  server:
+    image: oven/bun:1.2.8
+    working_dir: /app
+    volumes:
+      - ./Server:/app                          # source code
+      - server-modules:/app/node_modules       # Linux‑native deps
+      # ↓ built front‑end assets land here
+      - frontend-dist:/app/frontend/dist
+    command:
+      - /bin/sh
+      - -c
+      - bun install --frozen-lockfile && bun --hot src/index.ts
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+
+  # ───────────────────────── Front‑end (Vite + React) ──────────────────────
+  frontend:
+    image: oven/bun:1.2.8
+    working_dir: /app
+    volumes:
+      - ./frontend:/app                       # source code
+      - frontend-modules:/app/node_modules
+      # ↓ output folder watched by Rollup
+      - frontend-dist:/app/dist
+    command:
+      - /bin/sh
+      - -c
+      - bun install --frozen-lockfile && bunx vite build --watch --outDir /app/dist
+    environment:
+      - NODE_ENV=development
+    # no ports: the build just writes files, nothing to expose
+
+# ───────────────────────────── Named volumes ───────────────────────────────
+volumes:
+  server-modules:
+  frontend-modules:
+  frontend-dist:

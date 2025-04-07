@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { api } from '../lib/api';
 import Home from '../View/Home';
 import {  createRoute } from '@tanstack/react-router'
 import RootRoute from '@/lib/routeConfig/rootRoute';
@@ -9,8 +8,7 @@ function Index() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const Res = await api.
-      console.log(Res);
+     
     
     };
 

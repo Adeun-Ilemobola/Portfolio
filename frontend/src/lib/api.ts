@@ -1,5 +1,5 @@
 import { hc } from 'hono/client';
-import {type APIRoutes } from '@server/index'
+import {type APIRoutes } from '@server/src/index'
 
 const client = hc<APIRoutes>('/');
  type Client = typeof client

@@ -1,0 +1,8 @@
+# keep your images slim & builds fast
+.git
+.vscode
+*.log
+node_modules
+frontend/node_modules
+Server/node_modules
+dist

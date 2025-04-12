@@ -21,6 +21,7 @@ if (isProd){
     console.log("Local development");
     app.use('*', serveStatic({ root: './frontend/dist' }));
     app.use('*', serveStatic({ path: './frontend/dist/index.html' }));
+    
 }
 
 

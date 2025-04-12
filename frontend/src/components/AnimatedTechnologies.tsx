@@ -1,7 +1,7 @@
-import { motion , animate } from "framer-motion";
+import {   animate } from "framer-motion";
 import UtilityCard from "./utilityCard";
 import {useEffect, useRef } from 'react'
-import { SiCss , SiReact ,SiNextdotjs , SiPrisma , SiTypescript , SiHtml5 , SiTailwindcss  ,SiCplusplus , SiGithub } from '@icons-pack/react-simple-icons';
+import { SiCss , SiReact ,SiNextdotjs , SiPrisma , SiTypescript , SiHtml5 , SiTailwindcss  ,SiCplusplus  } from '@icons-pack/react-simple-icons';
 
 const technologies = [
      { name: "CSS", Icon: SiCss },

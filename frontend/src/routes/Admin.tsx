@@ -2,7 +2,7 @@ import {  useState , useRef } from 'react';
 import { createRoute } from '@tanstack/react-router';
 import RootRoute from '@/components/rootRoute';
 import z from 'zod'
-import {zPorject , zSession} from "@server/src/ZodObject"
+import {zPorject } from "@server/src/ZodObject"
 import { Button } from '@/components/ui/button';
 import InputBox from '@/components/InputBox';
 
@@ -23,7 +23,7 @@ function Admin() {
     PublishedDate:null
 
   });
-  const [session , setSession] = useState<z.infer<typeof zSession>>();
+  // const [session , setSession] = useState<z.infer<typeof zSession>>();
   const imgRefInput= useRef<HTMLInputElement | null>(null)
   const [tool , setTool] =useState<z.infer<typeof zTool>>({
     name:"",

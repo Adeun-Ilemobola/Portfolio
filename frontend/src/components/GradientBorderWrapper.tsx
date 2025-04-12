@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import React from "react";
 
-function WaveBorderWrapper({ children, classs = "" }: { children: React.ReactNode; classs?: string }) {
+function WaveBorderWrapper({ children,  }: { children: React.ReactNode; classs?: string }) {
   return (
     <div className={`relative inline-block p-1 rounded-sm  border-gray-500`}>
       {/* Animated Border */}

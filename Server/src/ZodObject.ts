@@ -25,3 +25,9 @@ export const zPorject = z.object({
     PublishedDate: z.string().nullable()
 
 })
+
+
+export const zSession = z.object({
+    id:z.string(),
+    expire:z.string(),
+})

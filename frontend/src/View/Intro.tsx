@@ -15,7 +15,7 @@ const Contact = [
 ]
 
 
-export default function Home() {
+export default function Intro() {
      const [showContact, setShowContact] = useState(false)
      return (
           <div className=' min-w-full h-[800px]   '>
@@ -134,11 +134,6 @@ export default function Home() {
 
 
                          }
-
-
-
-
-
 
 
                     </div>

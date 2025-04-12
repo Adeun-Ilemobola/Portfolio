@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-router'
 import IndexRoute from './routes/Index.tsx'
 import AdminRoute from './routes/Admin.tsx'
-import RootRoute from './lib/routeConfig/rootRoute.tsx'
+import RootRoute from './components/rootRoute.tsx'
 
 
 

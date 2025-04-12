@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import Home from '../View/Home';
+import RootRoute from '@/components/rootRoute';
+import Intro from '@/View/Intro';
 import {  createRoute } from '@tanstack/react-router'
-import RootRoute from '@/lib/routeConfig/rootRoute';
+
 
 function Index() {
   const [data, setData] = useState<{ message: string; timestamp: string } | null>(null);
@@ -20,7 +21,7 @@ function Index() {
 
   return (
     <div className="flex flex-col  min-h-screen p-4">
-      <Home/>
+      <Intro/>
      
 
       

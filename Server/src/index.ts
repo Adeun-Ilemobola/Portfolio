@@ -9,15 +9,15 @@ app.use('*', cors());
 
 const apiRoutes = app.basePath('/api').route("/project" , ProjectRoute)
 
-// app.use('*', serveStatic({ root: '../frontend/dist' }));
-// app.use('*', serveStatic({ path: '../frontend/dist/index.html' }));
-app.use(
-    '*',
-    serveStatic({
-      root: './frontend/dist',
-      rewriteRequestPath: (path) => (path === '/' ? '/index.html' : path),
-    }),
-  )
+app.use('*', serveStatic({ root: './frontend/dist' }));
+app.use('*', serveStatic({ path: './frontend/dist/index.html' }));
+// app.use(
+//     '*',
+//     serveStatic({
+//       root: './frontend/dist',
+//       rewriteRequestPath: (path) => (path === '/' ? '/index.html' : path),
+//     }),
+//   )
 
 export default app
 export type APIRoutes = typeof apiRoutes;

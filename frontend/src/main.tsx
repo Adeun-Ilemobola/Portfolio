@@ -10,7 +10,7 @@ import {
 import IndexRoute from './routes/Index.tsx'
 import AdminRoute from './routes/Admin.tsx'
 import RootRoute from './components/rootRoute.tsx'
-import './index.css'
+import './index.css';
 
 
 const routeTree = RootRoute.addChildren([IndexRoute , AdminRoute])

@@ -1,18 +1,25 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
   ],
-
   "compilerOptions": {
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "composite": true,
     "baseUrl": ".",
-    "paths": { 
-      "@/*": ["./src/*"],
-      "@server/*": ["../Server/*"]
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@server/*": [
+        "../Server/*"
+      ]
     }
   }
 }

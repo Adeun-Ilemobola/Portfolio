@@ -19,5 +19,8 @@ app.use('*', serveStatic({ path: './frontend/dist/index.html' }));
 //     }),
 //   )
 
-export default app
+export default { 
+    port: 3000, 
+    fetch: app.fetch, 
+} 
 export type APIRoutes = typeof apiRoutes;

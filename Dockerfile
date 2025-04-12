@@ -48,6 +48,7 @@ COPY --from=server-build /app/Server /app
 # Copy built frontend assets to public dir
 COPY --from=frontend-build /app/frontend/dist /app/public
 
+ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 

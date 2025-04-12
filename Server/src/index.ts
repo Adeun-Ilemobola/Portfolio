@@ -25,15 +25,6 @@ if (isProd){
 }
 
 
-
-// app.use(
-//     '*',
-//     serveStatic({
-//       root: './frontend/dist',
-//       rewriteRequestPath: (path) => (path === '/' ? '/index.html' : path),
-//     }),
-//   )
-
 export default { 
     port: 3000, 
     fetch: app.fetch, 

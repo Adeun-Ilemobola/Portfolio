@@ -7,10 +7,23 @@ const app = new Hono()
 app.use('*', logger());
 app.use('*', cors());
 
-const apiRoutes = app.basePath('/api').route("/project" , ProjectRoute)
+const apiRoutes = app.basePath('/api')
+.route("/project" , ProjectRoute);
 
-app.use('*', serveStatic({ root: './frontend/dist' }));
-app.use('*', serveStatic({ path: './frontend/dist/index.html' }));
+const isProd = process.env.NODE_ENV === 'production';
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
+if (isProd){
+    app.use('*', serveStatic({ root: './public' }));
+app.use('*', serveStatic({ path: './public/index.html' }));
+
+}else{
+    app.use('*', serveStatic({ root: './frontend/dist' }));
+    app.use('*', serveStatic({ path: './frontend/dist/index.html' }));
+}
+
+
+
 // app.use(
 //     '*',
 //     serveStatic({

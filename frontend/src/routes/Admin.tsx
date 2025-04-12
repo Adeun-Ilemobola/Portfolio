@@ -34,9 +34,9 @@ function Admin() {
   function formProject(e:React.ChangeEvent<HTMLInputElement>){
     const {value , name}=e.target;
 
-    setProjectInfo(prw=>({
+    setProjectInfo((prw: typeof projectInfo) => ({
       ...prw,
-      [name]:value
+      [name]: value
     }))
 
   }

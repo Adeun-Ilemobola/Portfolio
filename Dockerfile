@@ -11,11 +11,13 @@ WORKDIR /app/frontend
 COPY frontend/package.json ./
 
 # Install front-end dependencies
-# (Remove --frozen-lockfile if you don't have a lock file)
 RUN bun install
 
 # Copy the rest of the frontend source code
 COPY frontend/ .
+
+# 👇 This allows @server/* imports to work during build
+COPY Server /app/Server
 
 # Build the frontend (creates /app/frontend/dist)
 RUN bun run build

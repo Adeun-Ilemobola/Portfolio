@@ -5,9 +5,9 @@
     FROM oven/bun:${BUN_VERSION}-slim AS base
     WORKDIR /app
     
-    # 1‑copy only manifests first – maximises layer‑cache reuse
-    COPY bun.lockb package.json ./
-    RUN bun install --frozen-lockfile          # installs work‑space stubs only
+    # # 1‑copy only manifests first – maximises layer‑cache reuse
+    # COPY bun.lockb package.json ./
+    # RUN bun install --frozen-lockfile          # installs work‑space stubs only
     
     # 2‑copy the rest of the source
     COPY . .

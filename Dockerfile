@@ -7,19 +7,20 @@ ARG BUN_VERSION=1.2.8
 FROM oven/bun:${BUN_VERSION}-slim AS frontend-build
 WORKDIR /app/frontend
 
-# Copy only the frontend's package.json first (for caching)
+# Copy only frontend package.json for caching
 COPY frontend/package.json ./
-
-# Install front-end dependencies
 RUN bun install
 
-# Copy the rest of the frontend source code
+# Copy frontend source code
 COPY frontend/ .
 
-# 👇 This allows @server/* imports to work during build
+# 👇 Copy server code so @server/* paths work
 COPY Server /app/Server
 
-# Build the frontend (creates /app/frontend/dist)
+# 👇 Install server dependencies in frontend context (needed for zod etc)
+RUN cd /app/Server && bun install
+
+# Run the frontend build (Vite + TSC)
 RUN bun run build
 
 ###############################
@@ -28,13 +29,11 @@ RUN bun run build
 FROM oven/bun:${BUN_VERSION}-slim AS server-build
 WORKDIR /app/Server
 
-# Copy the server’s package.json
+# Copy server package.json and install deps
 COPY Server/package.json ./
-
-# Install server dependencies
 RUN bun install
 
-# Copy the rest of the server code
+# Copy the full server source
 COPY Server/ .
 
 ###############################
@@ -43,14 +42,14 @@ COPY Server/ .
 FROM oven/bun:${BUN_VERSION}-slim AS prod
 WORKDIR /app
 
-# Copy fully built server (with node_modules) from server-build
+# Copy built server
 COPY --from=server-build /app/Server /app
 
-# Copy the built frontend assets from frontend-build
+# Copy built frontend assets to public dir
 COPY --from=frontend-build /app/frontend/dist /app/public
 
 ENV PORT=3000
 EXPOSE 3000
 
-# Start your server (replace if your main file differs)
+# Launch the server
 CMD ["bun", "src/index.ts"]

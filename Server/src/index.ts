@@ -14,10 +14,11 @@ const isProd = process.env.NODE_ENV === 'production';
 console.log('NODE_ENV:', process.env.NODE_ENV);
 
 if (isProd){
+    console.log("production"); 
     app.use('*', serveStatic({ root: './public' }));
-app.use('*', serveStatic({ path: './public/index.html' }));
-
+    app.use('*', serveStatic({ path: './public/index.html' }));
 }else{
+    console.log("Local development");
     app.use('*', serveStatic({ root: './frontend/dist' }));
     app.use('*', serveStatic({ path: './frontend/dist/index.html' }));
 }

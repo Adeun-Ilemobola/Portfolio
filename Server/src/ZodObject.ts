@@ -10,7 +10,7 @@ export const zPorject = z.object({
             base64: z.string(),
             size: z.number(),
             type: z.string(),
-            lastModified: z.string(),
+            lastModified: z.number(),
         })
     ).min(1).max(10),
     Repository: z.string(),

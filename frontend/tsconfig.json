@@ -17,9 +17,7 @@
       "@/*": [
         "./src/*"
       ],
-      "@server/*": [
-        "../Server/*"
-      ]
+      "@server/*": ["../Server/src/*"]
     }
   }
 }

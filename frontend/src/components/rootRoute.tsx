@@ -1,4 +1,6 @@
 import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from "@/components/ui/sonner"
+
 import {
   // useQuery,
   // useMutation,
@@ -19,6 +21,7 @@ const RootRoute = createRootRoute({
   component: () => (
     <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <Toaster richColors />
       <Outlet />
       <TanStackRouterDevtools />
     </ThemeProvider>

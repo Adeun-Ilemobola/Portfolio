@@ -76,5 +76,6 @@ npm run dev
 ## 💬 Contact
 
 Have feedback or want to collaborate?
-Reach me via the contact section on the homepage or send an email directly to \[[your-email@example.com](mailto:your-email@example.com)].
+Reach me via the contact section on the homepage or send an email directly to \[[adeunilemobola@gmail.com](adeunilemobola@gmail.com
+)].
 

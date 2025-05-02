@@ -1,101 +1,39 @@
-# ###############################################################################
-# # compose.yaml – dev stack with:                                              #
-# #  ▸ Front‑end  ➜  vite build --watch  ➜  /app/dist (volume)                  #
-# #  ▸ Back‑end   ➜  hono  +  serves /app/frontend/dist from the same volume    #
-# #  ▸ Hot reload for both sides, one command: docker compose up                #
-# ###############################################################################
-
-# services:
-#   # ─────────────────────────── API (Hono + Bun) ────────────────────────────
-#   server:
-#     image: oven/bun:1.2.8
-#     working_dir: /app
-#     volumes:
-#       - ./Server:/app                          # source code
-#       - server-modules:/app/node_modules       # Linux‑native deps
-#       # ↓ built front‑end assets land here
-#       - frontend-dist:/app/frontend/dist
-#     command:
-#       - /bin/sh
-#       - -c
-#       - bun install --frozen-lockfile && bun --hot src/index.ts
-#     ports:
-#       - "3000:3000"
-#     environment:
-#       - NODE_ENV=development
-
-#   # ───────────────────────── Front‑end (Vite + React) ──────────────────────
-#   frontend:
-#     image: oven/bun:1.2.8
-#     working_dir: /app
-#     volumes:
-#       - ./frontend:/app                       # source code
-#       - frontend-modules:/app/node_modules
-#       # ↓ output folder watched by Rollup
-#       - frontend-dist:/app/dist
-#     command:
-#       - /bin/sh
-#       - -c
-#       - bun install --frozen-lockfile && bunx vite build --watch --outDir /app/dist
-#     environment:
-#       - NODE_ENV=development
-#     # no ports: the build just writes files, nothing to expose
-
-# # ───────────────────────────── Named volumes ───────────────────────────────
-# volumes:
-#   server-modules:
-#   frontend-modules:
-#   frontend-dist:
-
-# ------------------------------------------------------------
-###############################################################################
-# compose.yaml – DEV stack
-# … truncated header …
-###############################################################################
-
+# docker‑compose.yml ─ DEV stack
 x-bun: &bun
   image: oven/bun:1.2.8
-  working_dir: /app
   environment:
-    CHOKIDAR_USEPOLLING: "true"     # make rollup/vite watch rock‑solid on OSX/Win
     NODE_ENV: development
-  volumes:
-    - type: volume
-      source: bun-cache            # share ~/.bun across services for faster install
-      target: /usr/local/bun
-    - type: bind
-      source: .dockerignore        # keep context lean
-      target: /app/.dockerignore
-      read_only: true
+    CHOKIDAR_USEPOLLING: "true"
+    FRONTEND_DIST: /workspace/frontend/dist
 
 services:
-  # ─────────────────────────── API (Hono + Bun) ────────────────────────────
-  server:
-    <<: *bun
-    volumes:
-      - ./Server:/app
-      - frontend-dist:/app/frontend/dist
-    depends_on:
-      - frontend                   # wait for first bundle
-    command: >
-      sh -c "bun install --frozen-lockfile
-           && bun --hot src/index.ts"
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-
-  # ───────────────────────── Front‑end (Vite + React) ──────────────────────
+  # ───────── Front‑end (Vite + React) ─────────
   frontend:
     <<: *bun
-    volumes:
-      - ./frontend:/app
-      - frontend-dist:/app/dist
+    working_dir: /workspace/frontend
     command: >
-      sh -c "bun install --frozen-lockfile
-           && bunx vite build --watch --outDir /app/dist --emptyOutDir"
-    restart: unless-stopped
+      sh -c "bun install --frozen-lockfile &&
+             bunx vite build --watch"
+    volumes:
+      - "./:/workspace"                            # ← bind‑mount repo
+      - bun-cache:/usr/local/bun                   # bun cache
+      - frontend-dist:/workspace/frontend/dist     # output volume
+
+  # ───────── API (Hono + Bun) ─────────
+  server:
+    <<: *bun
+    working_dir: /workspace/Server
+    depends_on: [frontend]
+    command: >
+      sh -c "bun install --frozen-lockfile &&
+             bun --hot src/index.ts"
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./:/workspace"                            # ← bind‑mount repo
+      - bun-cache:/usr/local/bun
+      - frontend-dist:/workspace/frontend/dist
 
 volumes:
   bun-cache:
   frontend-dist:
-

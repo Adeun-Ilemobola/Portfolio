@@ -5,6 +5,7 @@ x-bun: &bun
     NODE_ENV: development
     CHOKIDAR_USEPOLLING: "true"
     FRONTEND_DIST: /workspace/frontend/dist
+    DATABASE_URL: "postgresql://postgres:7HeZhUPtRPQ8qJYN@db.mgmcrxxlvvkyigdlzids.supabase.co:5432/postgres"
 
 services:
   # ───────── Front‑end (Vite + React) ─────────

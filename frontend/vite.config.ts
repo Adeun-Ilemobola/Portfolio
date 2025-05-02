@@ -19,4 +19,16 @@ export default defineConfig({
   //     "@server": path.resolve(fileURLToPath(new URL(".", import.meta.url)), "../Server/src"),
   //   },
   // },
+
+  server:{
+    port: 3000, // Port for the development server
+    open: true, // Open the browser after server is started
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000', // Backend server URL
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  }
 })

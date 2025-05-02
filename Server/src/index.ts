@@ -9,16 +9,9 @@ const app = new Hono()
 app.use('*', logger());
 app.use('*', cors());
 
-import { drizzle } from 'drizzle-orm/postgres-js'
-import * as postgres from 'postgres';
 
-async function main() {
-    const client = postgres(process.env.DATABASE_URL!)
-    const db = drizzle({ client });
-}
-
-main();
-
+    
+    
 
 const apiRoutes = app.basePath('/api')
 .route("/project" , ProjectRoute);

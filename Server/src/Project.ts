@@ -5,8 +5,8 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { projects , projectTools  , projectImages } from './db/schema';
 import { nanoid } from 'nanoid';
 import { eq } from "drizzle-orm";
+import { db } from './db';
 
-const db = drizzle(process.env.DATABASE_URL!);
 const vProjectPost = zValidator(
     "json",
     zPorject
@@ -66,6 +66,11 @@ ProjectRoute.get("/", async (c) => {
 
 ProjectRoute.post('/', vProjectPost, async (c) => {
     try {
+        console.log("POST PROJECT" , {
+            url: c.req.url,
+            db:process.env.DATABASE_URL!
+        }); ;
+        
         const validated = c.req.valid("json");
         if (!validated) {
             return c.text("Invalid data", 400);
@@ -78,7 +83,7 @@ ProjectRoute.post('/', vProjectPost, async (c) => {
             repository: validated.Repository,
             deploymentPlatform: validated.DeploymentPlatform,
             url: validated.url,
-            publishedDate: validated.PublishedDate,      
+            publishedDate: validated.PublishedDate ?? "",      
         }
         const [createdProject] = await db.insert(projects).values(project).returning();
        
@@ -114,7 +119,7 @@ ProjectRoute.post('/', vProjectPost, async (c) => {
 
 
     } catch (error) {
-        console.error(`${error}`)
+        console.error(error)
         return c.text(`Something went wrong at  ${c.req.url}`, 500)
 
     }

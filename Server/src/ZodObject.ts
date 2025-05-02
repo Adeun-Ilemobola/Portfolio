@@ -25,7 +25,7 @@ export const zPorject = z.object({
             Description: z.string().min(3).max(200),
         })
     ),
-    PublishedDate: z.string().nullable()
+    PublishedDate: z.string()
 
 })
 

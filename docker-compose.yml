@@ -5,8 +5,7 @@ x-bun: &bun
     NODE_ENV: development
     CHOKIDAR_USEPOLLING: "true"
     FRONTEND_DIST: /workspace/frontend/dist
-    DATABASE_URL: "postgresql://postgres:7HeZhUPtRPQ8qJYN@db.mgmcrxxlvvkyigdlzids.supabase.co:5432/postgres"
-
+    DATABASE_URL: "postgresql://postgres.mgmcrxxlvvkyigdlzids:7HeZhUPtRPQ8qJYN@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
 services:
   # ───────── Front‑end (Vite + React) ─────────
   frontend:
@@ -34,6 +33,9 @@ services:
       - "./:/workspace"                            # ← bind‑mount repo
       - bun-cache:/usr/local/bun
       - frontend-dist:/workspace/frontend/dist
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1  
 
 volumes:
   bun-cache:

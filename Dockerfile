@@ -49,7 +49,7 @@ COPY --from=server-build /app/Server /app
 COPY --from=frontend-build /app/frontend/dist /app/public
 
 ENV NODE_ENV=production
-ENV DATABASE_URL=postgresql://postgres:7HeZhUPtRPQ8qJYN@db.mgmcrxxlvvkyigdlzids.supabase.co:5432/postgres
+ENV DATABASE_URL=postgresql://postgres.mgmcrxxlvvkyigdlzids:7HeZhUPtRPQ8qJYN@aws-0-us-west-1.pooler.supabase.com:6543/postgres
 ENV PORT=3000
 EXPOSE 3000
 

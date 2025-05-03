@@ -9,6 +9,7 @@ const app = new Hono()
 app.use('*', logger());
 app.use('*', cors());
 
+console.log("Loaded DATABASE_URL:", process.env.DATABASE_URL);
 
     
     

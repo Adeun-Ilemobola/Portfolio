@@ -4,6 +4,8 @@ import {
     text,
     varchar,
     integer,
+    boolean,
+    bigint,
     json,
     timestamp,
     serial,
@@ -25,7 +27,7 @@ import {
     base64: text('base64').notNull(),
     size: integer('size').notNull(),
     type: text('type').notNull(),
-    lastModified: integer('last_modified').notNull(),
+    lastModified: bigint('last_modified', { mode: 'number' }).notNull(),
   });
 
 

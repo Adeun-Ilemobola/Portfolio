@@ -58,8 +58,8 @@ ProjectRoute.get("/", async (c) => {
 
 
     } catch (error) {
-        console.error(`${error}`)
-        return c.text(`Something went wrong at  ${c.req.url}`, 500)
+        console.error("Database connection error:", error);
+  return c.text(`Something went wrong at  ${c.req.url}`, 500);
 
     }
 })
@@ -75,7 +75,6 @@ ProjectRoute.post('/', vProjectPost, async (c) => {
         if (!validated) {
             return c.text("Invalid data", 400);
         }
-        console.log(validated);
         const {  image, tool} = validated;
         const project = {
             id: nanoid(),
@@ -105,7 +104,7 @@ ProjectRoute.post('/', vProjectPost, async (c) => {
                 base64: val.base64,
                 size: val.size,
                 type: val.type,
-                lastModified: val.lastModified
+                lastModified: Number(val.lastModified)
             }
         })).returning()
 
@@ -119,8 +118,8 @@ ProjectRoute.post('/', vProjectPost, async (c) => {
 
 
     } catch (error) {
-        console.error(error)
-        return c.text(`Something went wrong at  ${c.req.url}`, 500)
+        console.error("Database connection error:", error);
+        return c.text(`Something went wrong at  ${c.req.url}`, 500);
 
     }
 })

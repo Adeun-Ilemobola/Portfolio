@@ -5,7 +5,7 @@ CREATE TABLE "project_images" (
 	"base64" text NOT NULL,
 	"size" integer NOT NULL,
 	"type" text NOT NULL,
-	"last_modified" integer NOT NULL
+	"last_modified" bigint NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "project_tools" (

@@ -20,10 +20,11 @@ import { DatePickerDemo } from '@/components/ui/DatePickerDemo';
 
 const zTool = z.object({
   name: z.string(),
-  Description: z.string()
+  description: z.string()
 
 })
 import React from 'react'
+import { log } from 'console';
 
 interface Props {
     setProjectInfo: React.Dispatch<React.SetStateAction<z.infer<typeof zPorject>>>,
@@ -32,10 +33,10 @@ interface Props {
 
 
 
-export default function CreateProject({projectInfo ,setProjectInfo}: Props) {
+export default function CreateProjectNode({projectInfo ,setProjectInfo}: Props) {
     const makeProject = useMutation({
       mutationFn: async (content: z.infer<typeof zPorject>) => {
-        const { data } = await axios.post("api/project", content)
+        const { data } = await axios.post("/api/PROJECT", content)
   
   
         return data;
@@ -47,7 +48,7 @@ export default function CreateProject({projectInfo ,setProjectInfo}: Props) {
     const imgRefInput = useRef<HTMLInputElement | null>(null)
     const [tool, setTool] = useState<z.infer<typeof zTool>>({
       name: "",
-      Description: ""
+      description: ""
     })
   
   
@@ -92,7 +93,7 @@ export default function CreateProject({projectInfo ,setProjectInfo}: Props) {
   
         setTool({
           name: "",
-          Description: ""
+          description: ""
         })
   
       }
@@ -116,7 +117,7 @@ export default function CreateProject({projectInfo ,setProjectInfo}: Props) {
     }
   
     function SendNewProject() {
-      if (projectInfo.PublishedDate == null) {
+      if (projectInfo.publishedDate == null) {
         setProjectInfo(prw => ({
           ...prw,
           PublishedDate: new Date().toISOString()
@@ -143,14 +144,16 @@ export default function CreateProject({projectInfo ,setProjectInfo}: Props) {
           setProjectInfo({
             name: "",
             image: [],
-            Repository: '',
-            DeploymentPlatform: '',
+            repository: '',
+            deploymentPlatform: '',
             url: '',
             tool: [],
-            PublishedDate: ""
+            publishedDate: ""
           })
         },
         onError: (error) => {
+          console.log(error);
+      
           toast.error("Error creating project")
         }
       })
@@ -178,14 +181,14 @@ export default function CreateProject({projectInfo ,setProjectInfo}: Props) {
   
           <div className=' flex flex-col gap-2'>
             <InputBox disable={makeProject.isPending} size={33} value={projectInfo.name} id={"name"} Name='name' set={formProject} />
-            <InputBox disable={makeProject.isPending} size={33} value={projectInfo.Repository} Name='Repository' id={"Repository"} set={formProject} />
-            <InputBox disable={makeProject.isPending} size={33} value={projectInfo.DeploymentPlatform} Name='DeploymentPlatform' id={"DeploymentPlatform"} set={formProject} />
+            <InputBox disable={makeProject.isPending} size={33} value={projectInfo.repository} Name='repository' id={"repository"} set={formProject} />
+            <InputBox disable={makeProject.isPending} size={33} value={projectInfo.deploymentPlatform} Name='deploymentPlatform' id={"deploymentPlatform"} set={formProject} />
             <InputBox disable={makeProject.isPending} size={33} value={projectInfo.url} id={"url"} Name='url' set={formProject} />
   
   
             <div className={`flex flex-col gap-1 w-[${33}rem]  `}>
-            <Label htmlFor='PublishedDate'>Published Date</Label>
-            <DatePickerDemo setDate={setDate} date={projectInfo.PublishedDate} />
+            <Label htmlFor='publishedDate'>Published Date</Label>
+            <DatePickerDemo setDate={setDate} date={projectInfo.publishedDate} />
             </div>
             
   
@@ -204,11 +207,11 @@ export default function CreateProject({projectInfo ,setProjectInfo}: Props) {
                 <Textarea
                   className=' resize-none'
                   disabled={makeProject.isPending}
-                  value={tool.Description}
+                  value={tool.description}
                   onChange={formTool}
-                  name="Description"
-                  id="Description-a"
-                  placeholder="Description"
+                  name="description"
+                  id="description-a"
+                  placeholder="description"
                   rows={4}
                 />
                 <Button disabled={makeProject.isPending} variant={"secondary"} size={"lg"} onClick={() => formProjectList("tool")}> add tool</Button>

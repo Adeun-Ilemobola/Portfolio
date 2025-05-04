@@ -15,7 +15,7 @@ console.log("Loaded DATABASE_URL:", process.env.DATABASE_URL);
     
 
 const apiRoutes = app.basePath('/api')
-.route("/project" , ProjectRoute);
+.route("/PROJECT" , ProjectRoute);
 
 console.log('NODE_ENV:', process.env.NODE_ENV);
 

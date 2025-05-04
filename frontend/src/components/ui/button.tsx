@@ -20,6 +20,17 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+
+         // 💜 Purple Vibe
+         purple: "bg-[#6C3FCB] text-white hover:bg-[#8455d6] dark:bg-[#5320a3] dark:hover:bg-[#7140c9] focus-visible:ring-[#9c7ddf]/50",
+
+
+      // 💚 Green Vibe
+      green: "bg-[#34A853] text-white hover:bg-[#4ac66a] dark:bg-[#2e7d4f] dark:hover:bg-[#3ca86d] focus-visible:ring-[#34A853]/40",
+
+      // 💙 Blue Vibe
+      blue:
+        "bg-[#3ca8e0] text-white shadow-xs hover:bg-[#4ec2f1] dark:bg-[#267a7a] dark:hover:bg-[#3ca8e0]",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

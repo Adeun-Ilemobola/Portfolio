@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@tanstack/react-router';
 import CreateProjectRoute from './CreateProjectRout';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, ShieldAlert } from 'lucide-react';
 
 function EditProject() {
     const { id } = EditProjectRoute.useParams()
@@ -210,7 +210,7 @@ function EditProject() {
                 return;
             }
             updatateProject.mutate(project)
-        }else{
+        } else {
             toast.error("Project not found")
         }
 
@@ -229,99 +229,105 @@ function EditProject() {
             </div>
             <div className={`flex-1 w-ful flex flex-col gap-2 items-center  ${project === undefined && "justify-center"}  `}>
 
-            {
-                project ?
+                {
+                    project ?
 
-                    (<>
-
-
-                        <div className='w-[75%] flex flex-col gap-2 justify-center '>
-                            <div className='flex flex-col justify-center gap-2  ring-1 ring-emerald-900/65 rounded-s-sm p-2'>
-                                <h3>Images</h3>
-                                <div className='flex flex-row gap-2'>
-                                    {project.image.map((image, index) => {
-                                        return (
-                                            <div key={index} className='w-32 h-24 bg-slate-200 rounded-md flex justify-center items-center'>
-                                                <img src={image.base64} alt="project image" className='w-full h-full object-cover' />
-                                            </div>
-                                        )
-                                    })}
+                        (<>
 
 
-                                    <Button onClick={() => fileRef.current?.click()} variant={"outline"} size={"lg"} className='w-32 h-24'>Add Image</Button>
-                                    <input ref={fileRef} type="file" id='hfjdks' onChange={(e) => formImage(e)} accept='image/*' className='hidden' />
+                            <div className='w-[75%] flex flex-col gap-2 justify-center '>
+                                <div className='flex flex-col justify-center gap-2  ring-1 ring-emerald-900/65 rounded-s-sm p-2'>
+                                    <h3>Images</h3>
+                                    <div className='flex flex-row gap-2'>
+                                        {project.image.map((image, index) => {
+                                            return (
+                                                <div key={index} className='w-32 h-24 bg-slate-200 rounded-md flex justify-center items-center'>
+                                                    <img src={image.base64} alt="project image" className='w-full h-full object-cover' />
+                                                </div>
+                                            )
+                                        })}
 
 
+                                        <Button onClick={() => fileRef.current?.click()} variant={"outline"} size={"lg"} className='w-32 h-24'>Add Image</Button>
+                                        <input ref={fileRef} type="file" id='hfjdks' onChange={(e) => formImage(e)} accept='image/*' className='hidden' />
+
+
+                                    </div>
                                 </div>
-                            </div>
 
 
-                            <div className='flex flex-col justify-center gap-2  ring-1 ring-emerald-900/65 rounded-s-sm p-2'>
-                                <div className=' flex flex-col gap-1.5 '>
-                                    <InputBox disable={updatateProject.isPending} size={32} value={tool.name} id={"name"} Name='name' set={formTool} />
-                                    <Label htmlFor='description-a'>Description</Label>
-                                    <Textarea
-                                        className=' resize-none'
-                                        disabled={false}
-                                        value={tool.description}
-                                        onChange={formTool}
-                                        name="description"
-                                        id="description-a"
-                                        placeholder="Description"
-                                        rows={4}
-                                    />
-                                    <Button disabled={updatateProject.isPending} variant={"secondary"} size={"lg"} onClick={() => formProjectList("tool")}> add tool</Button>
-                                    <div className=' flex flex-row flex-wrap gap-1.5 overflow-scroll'>
-                                        {project?.tool.map((tool, index) => (
-                                            <Badge key={index} className=' text-[14px]' variant={"green"} onDoubleClick={() => {
-                                                setProject(prw => {
-                                                    if (prw) {
-                                                        return {
-                                                            ...prw,
-                                                            tool: prw.tool.filter((_, i) => i !== index)
+                                <div className='flex flex-col justify-center gap-2  ring-1 ring-emerald-900/65 rounded-s-sm p-2'>
+                                    <div className=' flex flex-col gap-1.5 '>
+                                        <InputBox disable={updatateProject.isPending} size={32} value={tool.name} id={"name"} Name='name' set={formTool} />
+                                        <Label htmlFor='description-a'>Description</Label>
+                                        <Textarea
+                                            className=' resize-none'
+                                            disabled={false}
+                                            value={tool.description}
+                                            onChange={formTool}
+                                            name="description"
+                                            id="description-a"
+                                            placeholder="Description"
+                                            rows={4}
+                                        />
+                                        <Button disabled={updatateProject.isPending} variant={"secondary"} size={"lg"} onClick={() => formProjectList("tool")}> add tool</Button>
+                                        <div className=' flex flex-row flex-wrap gap-1.5 overflow-scroll'>
+                                            {project?.tool.map((tool, index) => (
+                                                <Badge key={index} className=' text-[14px]' variant={"green"} onDoubleClick={() => {
+                                                    setProject(prw => {
+                                                        if (prw) {
+                                                            return {
+                                                                ...prw,
+                                                                tool: prw.tool.filter((_, i) => i !== index)
+                                                            }
                                                         }
-                                                    }
-                                                    return prw;
-                                                })
-                                            }}>
-                                                {tool.name}
-                                            </Badge>
-                                        ))}
-                                    </div>
+                                                        return prw;
+                                                    })
+                                                }}>
+                                                    {tool.name}
+                                                </Badge>
+                                            ))}
+                                        </div>
 
 
-                                </div>
-
-                            </div>
-
-                            <div className='flex flex-col justify-center gap-2  ring-1 ring-emerald-900/65 rounded-s-sm p-2'>
-                                <h3>Project Info</h3>
-                                <div className='flex flex-col gap-3'>
-                                    <InputBox disable={updatateProject.isPending} size={30} value={project.name} id={"name"} Name='name' set={formProject} />
-                                    <InputBox disable={updatateProject.isPending} size={30} value={project.repository} Name='repository' id={"repository"} set={formProject} />
-                                    <InputBox disable={updatateProject.isPending} size={30} value={project.deploymentPlatform} Name='deployment Platform' id={"deploymentPlatform"} set={formProject} />
-                                    <InputBox disable={updatateProject.isPending} size={30} value={project.url} id={"url"} Name='url' set={formProject} />
-
-
-                                    <div className={`flex flex-col gap-1 w-[${30}rem]  `}>
-                                        <Label htmlFor='publishedDate'>Published Date</Label>
-                                        <DatePickerDemo setDate={setDate} date={project.publishedDate} />
                                     </div>
 
                                 </div>
 
+                                <div className='flex flex-col justify-center gap-2  ring-1 ring-emerald-900/65 rounded-s-sm p-2'>
+                                    <h3>Project Info</h3>
+                                    <div className='flex flex-col gap-3'>
+                                        <InputBox disable={updatateProject.isPending} size={30} value={project.name} id={"name"} Name='name' set={formProject} />
+                                        <InputBox disable={updatateProject.isPending} size={30} value={project.repository} Name='repository' id={"repository"} set={formProject} />
+                                        <InputBox disable={updatateProject.isPending} size={30} value={project.deploymentPlatform} Name='deployment Platform' id={"deploymentPlatform"} set={formProject} />
+                                        <InputBox disable={updatateProject.isPending} size={30} value={project.url} id={"url"} Name='url' set={formProject} />
+
+
+                                        <div className={`flex flex-col gap-1 w-[${30}rem]  `}>
+                                            <Label htmlFor='publishedDate'>Published Date</Label>
+                                            <DatePickerDemo setDate={setDate} date={project.publishedDate} />
+                                        </div>
+
+                                    </div>
+
+                                </div>
                             </div>
-                        </div>
 
-                        <Button disabled={updatateProject.isPending} onClick={() => {handleUpdate() }} variant={"purple"}>Update{updatateProject.isPending && (<LoaderCircle className=' animate-spin' />)}</Button>
-
+                            <Button disabled={updatateProject.isPending} onClick={() => { handleUpdate() }} variant={"purple"}>Update{updatateProject.isPending && (<LoaderCircle className=' animate-spin' />)}</Button>
 
 
-                    </>) :
-                    (<h1> Project not found </h1>)
 
-            }
-             </div>
+                        </>) :
+                        (
+                            <div className='flex gap-2 justify-center items-center-safe w-48 h-40'>
+                                <LoaderCircle className=' text-2xl animate-spin' />
+                                <h2 className='text-lg'>Loading Projects</h2>
+
+                            </div>
+                        )
+
+                }
+            </div>
 
         </div>
     );

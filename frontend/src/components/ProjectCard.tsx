@@ -2,6 +2,8 @@ import React from 'react'
 import z from 'zod'
 import { zPorject } from '@server/ZodObject'
 import { Button } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
+import { DateTime } from "luxon";
 
 import {
     Card,
@@ -12,15 +14,19 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Badge } from './ui/badge';
+import EditProjectRoute from '@/routes/ADMIN/EditProject';
+import { ImageOff } from 'lucide-react';
 
 
 interface ProjectCardProps {
     projectInfo: z.infer<typeof zPorject>,
     ModifyMode: boolean,
+    del: (id: string | undefined) => void,
 }
-export default function ProjectCard({ projectInfo, ModifyMode }: ProjectCardProps) {
+export default function ProjectCard({ projectInfo, ModifyMode, del }: ProjectCardProps) {
+   const fData = DateTime.fromISO(projectInfo.publishedDate, { zone: "utc" }).toFormat("M/d/yyyy")
     return (
-        <Card className=" w-[36rem] py-3">
+        <Card className=" w-[36rem] h-[30rem]  py-3">
 
             <CardContent className='px-3'>
                 <div className='flex flex-col gap-2'>
@@ -35,17 +41,28 @@ export default function ProjectCard({ projectInfo, ModifyMode }: ProjectCardProp
 
                     <div className='flex flex-col gap-2'>
 
-                        <div className=' w-full h-72 flex flex-row-reverse justify-between'>
+                        <div className='f w-full h-64 flex-1 flex flex-col justify-between items-center'>
                             {projectInfo.image[0]?.base64 ? (
                                 <img src={projectInfo.image[0]?.base64} alt="project image" className='w-full h-72 object-cover rounded-md' />
                             ) : (
-                                <h2> no image</h2>
+                                <ImageOff className=' text-4xl text-amber-500/70' />
                             )}
 
 
                         </div>
+                        <Badge variant={"outline"}>{fData}</Badge>
 
-                        <Badge variant={"outline"}>{projectInfo.publishedDate}</Badge>
+                       
+                    </div>
+
+                    
+                    <div className='flex items-center flex-row gap-2 mt-2'>
+                        {projectInfo.tool.map((tool, index) => {
+                            return (
+                                <Badge key={index} variant={"secondary"}>{tool.name}</Badge>
+                            )
+                        })}
+
                     </div>
 
 
@@ -55,20 +72,23 @@ export default function ProjectCard({ projectInfo, ModifyMode }: ProjectCardProp
             <CardFooter className='px-3'>
 
 
-                <div className='flex justify-center flex-row gap-2'>
-                    {projectInfo.tool.map((tool, index) => {
-                        return (
-                            <Badge key={index} variant={"secondary"}>{tool.name}</Badge>
-                        )
-                    })}
 
-                </div>
 
 
                 {ModifyMode && (
-                    <div className='flex flex-row-reverse gap-2'>
-                        <Button className='ml-auto' variant={"purple"}>Edit</Button>
-                        <Button className='ml-auto' variant={"destructive"}>Delete</Button>
+                    <div className=' flex-1 flex flex-row-reverse gap-2'>
+                        <Link
+                            to={EditProjectRoute.to}
+                            preload="intent"
+                            params={{ id: projectInfo.id || "" }}
+
+                        >
+
+                            <Button className='' size={"sm"} variant={"purple"}>Edit</Button>
+
+                        </Link>
+
+                        <Button size={"sm"} onClick={() => { del(projectInfo.id) }} className='' variant={"destructive"}>Delete</Button>
 
                     </div>
                 )}

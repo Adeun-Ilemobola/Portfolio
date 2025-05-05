@@ -61,7 +61,7 @@ function CreateProject() {
               </TabsContent>
               <TabsContent className=' flex flex-col justify-center items-center' value="preview Card">
   
-               <ProjectCard projectInfo={projectInfo}  ModifyMode={false}/>
+               <ProjectCard projectInfo={projectInfo}  ModifyMode={false} del={(id: string | undefined)=>{}}/>
 
               </TabsContent>
             </Tabs>

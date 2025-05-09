@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from '@tanstack/react-router';
 import CreateProjectRoute from './CreateProjectRout';
 import { LoaderCircle, ShieldAlert } from 'lucide-react';
+import { DateTime } from 'luxon';
 
 function EditProject() {
     const { id } = EditProjectRoute.useParams()
@@ -86,8 +87,6 @@ function EditProject() {
         description: "",
 
     })
-
-
     useEffect(() => {
         if (data) {
             console.log(data);
@@ -135,12 +134,13 @@ function EditProject() {
         }
     }
     function setDate(date: Date | undefined) {
+        const dateInput = DateTime.fromISO(date?.toString() || "");
         if (date) {
             setProject(prw => {
                 if (prw) {
                     return {
                         ...prw,
-                        publishedDate: date.toLocaleDateString()
+                        publishedDate: dateInput.toFormat("yyyy-MM-dd")
                     }
                 }
                 return prw;
@@ -215,9 +215,6 @@ function EditProject() {
         }
 
     }
-
-
-
 
 
     return (

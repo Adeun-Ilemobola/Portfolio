@@ -26,7 +26,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ projectInfo, ModifyMode, del }: ProjectCardProps) {
    const fData = DateTime.fromISO(projectInfo.publishedDate, { zone: "utc" }).toFormat("M/d/yyyy")
     return (
-        <Card className=" w-[36rem] h-[30rem]  py-3">
+        <Card className=" w-[32rem] h-[28rem]  py-3">
 
             <CardContent className='px-3'>
                 <div className='flex flex-col gap-2'>

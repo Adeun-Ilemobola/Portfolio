@@ -11,9 +11,6 @@ app.use('*', cors());
 
 console.log("Loaded DATABASE_URL:", process.env.DATABASE_URL);
 
-    
-    
-
 const apiRoutes = app.basePath('/api')
 .route("/PROJECT" , ProjectRoute);
 

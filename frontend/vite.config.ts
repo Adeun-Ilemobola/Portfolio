@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), tsconfigPaths() ],
@@ -13,12 +12,6 @@ export default defineConfig({
     outDir: 'dist', // Build output folder
     emptyOutDir: true, // Empty the output folder before building
   },
-  // resolve: {
-  //   alias: {
-  //     "@": path.resolve(fileURLToPath(new URL(".", import.meta.url)), "./src"),
-  //     "@server": path.resolve(fileURLToPath(new URL(".", import.meta.url)), "../Server/src"),
-  //   },
-  // },
 
   server:{
     port: 3000, // Port for the development server

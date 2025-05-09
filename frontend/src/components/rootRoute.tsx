@@ -15,7 +15,20 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // staleTime: 1000 * 60 * 5, // 5 minutes
+      // cacheTime: 1000 * 60 * 10, // 10 minutes
+      // refetchOnWindowFocus: false,
+      // refetchOnReconnect: false,
+    },
+    mutations: {
+      // retry: false,
+    },
+    
+  },
+})
 
 const RootRoute = createRootRoute({
   component: () => (

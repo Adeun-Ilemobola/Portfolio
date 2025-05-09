@@ -13,13 +13,15 @@ import RootRoute from './components/rootRoute.tsx'
 import './index.css';
 import EditProjectRoute from './routes/ADMIN/EditProject.tsx'
 import CreateProjectRoutRoute from './routes/ADMIN/CreateProjectRout.tsx'
+import ProjectRoute from './routes/Project.tsx'
 
 
 const routeTree = RootRoute.addChildren([
   IndexRoute , 
   AdminRoute,
   CreateProjectRoutRoute,
-  EditProjectRoute
+  EditProjectRoute,
+  ProjectRoute
 ])
 
 const router = createRouter({ routeTree })

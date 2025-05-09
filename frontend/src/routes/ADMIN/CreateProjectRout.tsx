@@ -19,6 +19,7 @@ import { zPorject } from "@server/ZodObject"
 import { Badge } from '@/components/ui/badge';
 import AdminRoute from './Admin';
 import ProjectCard from '@/components/ProjectCard';
+import ProjectView from '@/components/ProjectView';
 
 function CreateProject() {
   const [Preview, setPreview] = useState(false)
@@ -58,12 +59,15 @@ function CreateProject() {
                   <h1 className='text-3xl font-bold'>Preview</h1>
                   <p className='text-lg'>This is the preview of the project</p>
                 </div>
+                <ProjectView project={projectInfo} />
               </TabsContent>
               <TabsContent className=' flex flex-col justify-center items-center' value="preview Card">
   
                <ProjectCard projectInfo={projectInfo}  ModifyMode={false} del={(id: string | undefined)=>{}}/>
 
               </TabsContent>
+
+
             </Tabs>
   
   

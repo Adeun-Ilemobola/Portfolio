@@ -26,7 +26,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ projectInfo, ModifyMode, del }: ProjectCardProps) {
    const fData = DateTime.fromISO(projectInfo.publishedDate, { zone: "utc" }).toFormat("M/d/yyyy")
     return (
-        <Card className=" w-[32rem] h-[28rem]  py-3">
+        <Card className=" w-[32rem] h-[28.5rem] gap-4  py-3">
 
             <CardContent className='px-3'>
                 <div className='flex flex-col gap-2'>
@@ -71,12 +71,8 @@ export default function ProjectCard({ projectInfo, ModifyMode, del }: ProjectCar
             </CardContent>
             <CardFooter className='px-3'>
 
-
-
-
-
                 {ModifyMode && (
-                    <div className=' flex-1 flex flex-row-reverse gap-2'>
+                    <div className=' flex flex-row-reverse gap-2'>
                         <Link
                             to={EditProjectRoute.to}
                             preload="intent"

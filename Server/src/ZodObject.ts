@@ -36,3 +36,11 @@ export const zSession = z.object({
     id:z.string(),
     expire:z.string(),
 })
+
+
+
+export const zContact = z.object({
+    name: z.string().min(3),
+    email: z.string().email(),
+    message: z.string().min(3).max(500),
+})

@@ -1,9 +1,14 @@
 import { Base64FileResult } from '@/lib/utils'
 import { zPorject } from '@server/ZodObject'
 import React from 'react'
-import { useState , useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { z } from 'zod'
 import { Badge } from './ui/badge'
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 
 interface ProjectViewProps {
@@ -27,7 +32,7 @@ export default function ProjectView({ project }: ProjectViewProps) {
 
     }
     return (
-        <div className='flex flex-1 w-full flex-col gap-1.5 '>
+        <div className='flex flex-1 w-full flex-col gap-1.5 p-1.5 '>
 
             <div className='flex flex-row gap-2 justify-center'>
                 <h1 className=' text-2xl'>{project.name}</h1>
@@ -41,18 +46,23 @@ export default function ProjectView({ project }: ProjectViewProps) {
 
 
             <div className='flex flex-col gap-2'>
-                <div className='flex flex-col w-full h-[43rem] justify-center items-center'>
+                <div className='flex flex-col w-full h-[22rem] justify-center items-center'>
                     <img src={PreviewImg.base64} alt={PreviewImg.name} className='w-1/2 h-full object-cover rounded-lg' />
 
                 </div>
-                
+
+                <div className='flex flex-row gap-2 p-1.5'>
                     {project.image.map((img) => (
                         <div className='w-32 h-24  ring-1 ring-slate-200 rounded-md flex justify-center items-center overflow-hidden' key={img.id} onClick={() => SelImg(img.id)}>
-                        <img  src={img.base64} alt={img.name} className='w-full h-full object-cover' onClick={() => SelImg(img.id)} />
+                            <img src={img.base64} alt={img.name} className='w-full h-full object-cover' onClick={() => SelImg(img.id)} />
                         </div>
                     ))}
 
-                
+                </div>
+
+
+
+
 
 
             </div>
@@ -60,14 +70,25 @@ export default function ProjectView({ project }: ProjectViewProps) {
                 <h1 className='text-lg font-bold'>Tools:</h1>
                 <div className='flex flex-row gap-2'>
                     {project.tool.map((tool) => (
-                        <Badge key={tool.id} className='text-md text-slate-500'>{tool.name}</Badge>
+                        <HoverCard>
+                            <HoverCardTrigger>
+                                <Badge key={tool.id} className='text-md text-slate-500'>{tool.name}</Badge>
+                            </HoverCardTrigger>
+                            <HoverCardContent>
+                              {tool.description}
+                            </HoverCardContent>
+                        </HoverCard>
                     ))}
 
                 </div>
 
             </div>
-            
-               
+            <div className='flex flex-col gap-2'>
+                <h1 className='text-lg font-bold'>Description:</h1>
+                <p className='text-md text-slate-500'>{ }</p>
+            </div>
+
+
 
 
 

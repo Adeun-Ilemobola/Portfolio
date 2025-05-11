@@ -44,12 +44,7 @@ ProjectRoute.get("/:id", async (c) => {
             image: images
         }
 
-        console.log("-------  exampleProject  ----------", {
-            exampleProject
-        });
-
-
-
+    
         return c.json(exampleProject);
 
     } catch (error) {
@@ -81,9 +76,7 @@ ProjectRoute.get("/", async (c) => {
             }
 
         }))
-        console.log("-------  pList  ----------", {
-            pList
-        });
+       
 
 
         return c.json(pList);
@@ -174,14 +167,6 @@ ProjectRoute.put('/', vProjectPost, async (c) => {
             console.log("Invalid data", validated);
             return c.text("invalid entry", 401)
         }
-
-        const { id } = validated;
-
-        console.log("PUT PROJECT UPDATE ID", {
-            id: id,
-        }
-        );
-
 
 
         const [project] = await db.update(projects).set({

@@ -51,6 +51,9 @@ COPY --from=frontend-build /app/frontend/dist /app/public
 ENV NODE_ENV=production
 ENV DATABASE_URL=postgresql://postgres.mgmcrxxlvvkyigdlzids:7HeZhUPtRPQ8qJYN@aws-0-us-west-1.pooler.supabase.com:6543/postgres
 ENV FRONTEND_DIST=/app/public
+ENV GMAIL_USER="ogzygunt@gmail.com"
+ENV GMAIL_PASS="bhflamppqoowcexc"
+ENV GMAIL_SENDER="ogzygunt@gmail.com"
 ENV PORT=8080
 EXPOSE 8080
 

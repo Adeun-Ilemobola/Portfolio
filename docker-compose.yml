@@ -6,6 +6,9 @@ x-bun: &bun
     CHOKIDAR_USEPOLLING: "true"
     FRONTEND_DIST: /workspace/frontend/dist
     DATABASE_URL: "postgresql://postgres.mgmcrxxlvvkyigdlzids:7HeZhUPtRPQ8qJYN@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
+    GMAIL_USER: "ogzygunt@gmail.com"
+    GMAIL_PASS: "bhflamppqoowcexc"
+    GMAIL_SENDER: "ogzygunt@gmail.com"
 services:
   # ───────── Front‑end (Vite + React) ─────────
   frontend:
@@ -15,27 +18,27 @@ services:
       sh -c "bun install --frozen-lockfile &&
              bunx vite build --watch"
     volumes:
-      - "./:/workspace"                            # ← bind‑mount repo
-      - bun-cache:/usr/local/bun                   # bun cache
-      - frontend-dist:/workspace/frontend/dist     # output volume
+      - "./:/workspace" # ← bind‑mount repo
+      - bun-cache:/usr/local/bun # bun cache
+      - frontend-dist:/workspace/frontend/dist # output volume
 
   # ───────── API (Hono + Bun) ─────────
   server:
     <<: *bun
     working_dir: /workspace/Server
-    depends_on: [frontend]
+    depends_on: [ frontend ]
     command: >
       sh -c "bun install --frozen-lockfile &&
              bun --hot src/index.ts"
     ports:
       - "3000:3000"
     volumes:
-      - "./:/workspace"                            # ← bind‑mount repo
+      - "./:/workspace" # ← bind‑mount repo
       - bun-cache:/usr/local/bun
       - frontend-dist:/workspace/frontend/dist
     dns:
       - 8.8.8.8
-      - 1.1.1.1  
+      - 1.1.1.1
 
 volumes:
   bun-cache:

@@ -222,4 +222,32 @@ ProjectRoute.put('/', vProjectPost, async (c) => {
     }
 })
 
+
+ProjectRoute.delete('/:id', async (c) => {
+    try {
+       
+        const { id } = c.req.param();
+        if (id.length <= 0) {
+            return c.text("no ID", 401);
+        }
+        console.log("DELETE PROJECT", {
+            id: id,
+            url: c.req.url,
+            db: process.env.DATABASE_URL!
+        });
+
+        await db.delete(projectTools).where(eq(projectTools.projectId, id));
+        await db.delete(projectImages).where(eq(projectImages.projectId, id));
+
+        await db.delete(projects).where(eq(projects.id, id));
+      
+
+        return c.text("deleted", 200);
+
+    } catch (error) {
+        console.error(`${error}`)
+        return c.text(`Something went wrong at  ${c.req.url}`, 500)
+    }
+})
+
 export default ProjectRoute;

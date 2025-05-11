@@ -43,8 +43,16 @@ function Admin() {
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['projectList'] });
+      toast.success("Project Deleted", {
+        duration: 2000
+      })
     },
-    retry: 2
+    retry: 2,
+    onError: (error) => {
+      toast.error("Error Deleting Project", {
+        duration: 2000
+      })
+    }
   })
   const navigate = useNavigate();
   const [projects, setProjects] = useState<z.infer<typeof zPorject>[]>([
@@ -66,12 +74,7 @@ function Admin() {
       toast.success("Project Deleted", {
         duration: 2000
       })
-    } {
-      toast.error("Project not Delete Able", {
-        duration: 2000
-      })
     }
-
 
   }
 
@@ -83,7 +86,7 @@ function Admin() {
         </Link>
       </div>
 
-      <div className={`flex-1 flex w-full flex-wrap gap-4 p-4 overflow-y-auto ${isLoading ? 'justify-center items-center-safe' : ''}`}>
+      <div className={`flex-1 flex w-full flex-wrap gap-3 p-4 justify-center overflow-y-auto ${isLoading ? 'justify-center items-center' : ''}`}>
         {isLoading ?
           (
             <div className='flex gap-2 justify-center items-center-safe w-48 h-40'>
@@ -107,6 +110,7 @@ function Admin() {
             </>
           )
         }
+        
 
           {projects.map((project, index) => {
             return (

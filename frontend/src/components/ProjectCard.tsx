@@ -24,9 +24,10 @@ interface ProjectCardProps {
     del: (id: string | undefined) => void,
 }
 export default function ProjectCard({ projectInfo, ModifyMode, del }: ProjectCardProps) {
-   const fData = DateTime.fromISO(projectInfo.publishedDate, { zone: "utc" }).toFormat("M/d/yyyy")
+    const dt = DateTime.fromISO(projectInfo.publishedDate || "");
+    const fData = dt.isValid ? dt.toFormat("MM/dd/yyyy") : "Invalid Date";    
     return (
-        <Card className=" w-[32rem] h-[28.5rem] gap-4  py-3">
+        <Card className=" w-[34rem] h-[29rem] gap-4  py-3">
 
             <CardContent className='px-3'>
                 <div className='flex flex-col gap-2'>
@@ -72,7 +73,7 @@ export default function ProjectCard({ projectInfo, ModifyMode, del }: ProjectCar
             <CardFooter className='px-3'>
 
                 {ModifyMode && (
-                    <div className=' flex flex-row-reverse gap-2'>
+                    <div className=' flex flex-row-reverse gap-2 ml-auto'>
                         <Link
                             to={EditProjectRoute.to}
                             preload="intent"

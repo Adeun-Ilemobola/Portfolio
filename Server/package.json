@@ -6,9 +6,11 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.3",
+    "@types/luxon": "^3.6.2",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
     "hono": "^4.7.5",
+    "luxon": "^3.6.1",
     "nanoid": "^5.1.5",
     "nodemailer": "^7.0.3",
     "postgres": "^3.4.5",

@@ -9,9 +9,10 @@ export const transporter = nodemailer.createTransport({
 });
 
 
-export async function sendEmail( { subject = 'No Subject', text = 'No Content', } : {
+export async function sendEmail( { subject = 'No Subject', text = 'No Content' ,html } : {
         subject: string;
         text: string;
+        html?: string;
         }
 ) {
     const mailOptions = {
@@ -19,6 +20,7 @@ export async function sendEmail( { subject = 'No Subject', text = 'No Content', 
     to: process.env.GMAIL_USER, // Recipient's email address
     subject: subject, // Subject of the email
     text: text, // Plain text body of the email
+    html: html, // HTML body of the email
     };
     console.log("Sending email", mailOptions);
     

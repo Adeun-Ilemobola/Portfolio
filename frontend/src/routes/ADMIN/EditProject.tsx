@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { createRoute, useParams } from '@tanstack/react-router';
+import { createRoute, useParams , useNavigate } from '@tanstack/react-router';
 import RootRoute from '@/components/rootRoute';
 import { Button } from '@/components/ui/button';
 import { z } from 'zod';
@@ -20,6 +20,7 @@ import { LoaderCircle, ShieldAlert } from 'lucide-react';
 import { DateTime } from 'luxon';
 
 function EditProject() {
+    const navigate = useNavigate();
     const { id } = EditProjectRoute.useParams()
     const queryClient = new QueryClient()
 
@@ -134,8 +135,8 @@ function EditProject() {
         }
     }
     function setDate(date: Date | undefined) {
-        const dateInput = DateTime.fromISO(date?.toString() || "");
         if (date) {
+            const dateInput =  DateTime.fromJSDate(date);
             setProject(prw => {
                 if (prw) {
                     return {
@@ -210,6 +211,9 @@ function EditProject() {
                 return;
             }
             updatateProject.mutate(project)
+            navigate({
+                to: AdminRoute.to,   
+            })
         } else {
             toast.error("Project not found")
         }
@@ -219,8 +223,8 @@ function EditProject() {
 
     return (
         <div className={`flex flex-col gap-2   min-h-screen`}>
-            <div className=' w-full flex flex-row-reverse justify-center gap-2'>
-                <Link to={CreateProjectRoute.to} preload="intent" >
+            <div className=' w-full flex flex-row-reverse items-center gap-2'>
+                <Link to={CreateProjectRoute.to} preload="intent" className=' ml-auto'> 
                     <Button className='min-w-[200px] px-6 py-3' variant={"green"} size={"lg"}>Create Project</Button>
                 </Link>
             </div>
@@ -238,7 +242,18 @@ function EditProject() {
                                     <div className='flex flex-row gap-2'>
                                         {project.image.map((image, index) => {
                                             return (
-                                                <div key={index} className='w-32 h-24 bg-slate-200 rounded-md flex justify-center items-center'>
+                                                <div key={index} className='w-32 h-24 bg-slate-200 rounded-md flex justify-center items-center' 
+                                                onDoubleClick={() => {
+                                                    setProject(prw => {
+                                                        if (prw) {
+                                                            return {
+                                                                ...prw,
+                                                                image: prw.image.filter((_, i) => i !== index)
+                                                            }
+                                                        }
+                                                        return prw;
+                                                    })
+                                                }}>
                                                     <img src={image.base64} alt="project image" className='w-full h-full object-cover' />
                                                 </div>
                                             )
@@ -296,13 +311,20 @@ function EditProject() {
                                     <div className='flex flex-col gap-3'>
                                         <InputBox disable={updatateProject.isPending} size={30} value={project.name} id={"name"} Name='name' set={formProject} />
                                         <InputBox disable={updatateProject.isPending} size={30} value={project.repository} Name='repository' id={"repository"} set={formProject} />
-                                        <InputBox disable={updatateProject.isPending} size={30} value={project.deploymentPlatform} Name='deployment Platform' id={"deploymentPlatform"} set={formProject} />
+                                        <InputBox disable={updatateProject.isPending} size={30} value={project.deploymentPlatform} Name='deploymentPlatform' id={"deploymentPlatform"} set={formProject} />
                                         <InputBox disable={updatateProject.isPending} size={30} value={project.url} id={"url"} Name='url' set={formProject} />
 
 
                                         <div className={`flex flex-col gap-1 w-[${30}rem]  `}>
                                             <Label htmlFor='publishedDate'>Published Date</Label>
-                                            <DatePickerDemo setDate={setDate} date={project.publishedDate} />
+                                            <DatePickerDemo 
+                                            setDate={setDate} 
+                                            date={
+                                                project.publishedDate
+                                                ? DateTime.fromISO(project.publishedDate).toJSDate()
+                                                : DateTime.now().toJSDate()
+                                            } 
+                                            />
                                         </div>
 
                                     </div>

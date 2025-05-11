@@ -61,7 +61,7 @@ function Index() {
 
       </div>
 
-      <div className='flex flex-row flex-1 flex-wrap justify-center rounded-md  gap-2  w-full p-1 '>
+      <div className='flex-1 flex flex-col w-full flex-wrap gap-6 p-3 justify-center overflow-y-auto rounded-md   '>
         {projects.map((project, index) => {
           return (
             <Link key={index} to={ProjectRoute.to} params={{ id: project.id ?? "" }} >

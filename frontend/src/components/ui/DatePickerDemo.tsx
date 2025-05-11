@@ -13,10 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export function DatePickerDemo({setDate , date}:{setDate:(date:Date | undefined) => void ,date:string}) {
-    const parsedDate = date? new Date(date): undefined;
-
-
+export function DatePickerDemo({setDate , date}:{setDate:(date:Date | undefined) => void ,date:Date}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -34,7 +31,7 @@ export function DatePickerDemo({setDate , date}:{setDate:(date:Date | undefined)
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          selected={parsedDate}
+          selected={date}
           onSelect={setDate}
           initialFocus
         />

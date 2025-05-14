@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 
 import {
 
+  Navigate,
   RouterProvider,
   createRouter,
 
@@ -24,7 +25,11 @@ const routeTree = RootRoute.addChildren([
   ProjectRoute
 ])
 
-const router = createRouter({ routeTree })
+const router = createRouter({ 
+  routeTree,
+  defaultPreload: 'intent',
+  defaultPendingComponent: () => <Navigate to={IndexRoute.to}/>,
+})
 
 declare module '@tanstack/react-router' {
   interface Register {

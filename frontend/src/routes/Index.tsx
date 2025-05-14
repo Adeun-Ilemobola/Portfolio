@@ -61,12 +61,11 @@ function Index() {
 
       </div>
 
-      <div className='flex-1 flex flex-col w-full flex-wrap gap-6 p-3 justify-center overflow-y-auto rounded-md   '>
+      <div className='flex-1 flex w-full flex-wrap gap-6 p-3 justify-center overflow-y-auto rounded-md   '>
         {projects.map((project, index) => {
           return (
             <Link key={index} to={ProjectRoute.to} params={{ id: project.id ?? "" }} >
              <ProjectCard
-              
               projectInfo={project}
               ModifyMode={false}
               del={(DelId) => { }}
@@ -88,7 +87,7 @@ function Index() {
 
 const IndexRoute = createRoute({
   getParentRoute: () => RootRoute,
-  path: '/',
+  path: '/client',
   component: Index
 })
 

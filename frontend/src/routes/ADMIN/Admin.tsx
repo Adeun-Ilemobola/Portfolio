@@ -12,6 +12,7 @@ import axios from 'axios';
 import { toast } from "sonner"
 import { LoaderCircle, ShieldAlert } from 'lucide-react';
 import ProjectCard from '@/components/ProjectCard';
+import { SessionGuard } from '@/components/SessionGuard';
 
 
 function Admin() {
@@ -137,8 +138,13 @@ function Admin() {
 
 const AdminRoute = createRoute({
   getParentRoute: () => RootRoute,
-  path: '/Admin',
-  component: Admin,
+  path: '/client/Admin',
+  component: () => (<>
+  <SessionGuard>
+    <Admin />
+  </SessionGuard>
+
+  </>),
 
 });
 

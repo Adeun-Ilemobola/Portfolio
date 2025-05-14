@@ -163,13 +163,18 @@ export default function CreateProjectNode({ projectInfo, setProjectInfo }: Props
   }
 
   function setDate(date: Date | undefined) {
-    const dateInput = DateTime.fromISO(date?.toString() || "");
 
     if (date) {
-      setProjectInfo(prw => ({
-        ...prw,
-        PublishedDate: dateInput.toFormat("yyyy-MM-dd")
-      }))
+      const dateInput = DateTime.fromJSDate(date);
+      setProjectInfo(prw => {
+        if (prw) {
+          return {
+            ...prw,
+            publishedDate: dateInput.toFormat("yyyy-MM-dd")
+          }
+        }
+        return prw;
+      })
     }
 
   }
@@ -191,7 +196,11 @@ export default function CreateProjectNode({ projectInfo, setProjectInfo }: Props
 
           <div className={`flex flex-col gap-1 w-[${33}rem]  `}>
             <Label htmlFor='publishedDate'>Published Date</Label>
-            <DatePickerDemo setDate={setDate} date={projectInfo.publishedDate} />
+            <DatePickerDemo setDate={setDate} date={
+              projectInfo.publishedDate
+                ? DateTime.fromISO(projectInfo.publishedDate).toJSDate()
+                : DateTime.now().toJSDate()
+            } />
           </div>
 
 

@@ -21,14 +21,13 @@ const Contact = [
 
 
 export default function Intro() {
-     const [showContact, setShowContact] = useState(false)
-    
+
      return (
-          <div className=' min-w-full h-[900px]   '>
+          <div className='flex flex-col gap-1.5 min-w-full h-[900px]   '>
                {/* grid root */}
                <div className=' flex flex-row gap-2  w-full p-1 '>
                     {/* Picture of me */}
-                    <div className=' flex flex-col justify-center items-center ring ring-indigo-600/40  rounded-sm p-0.5 '>
+                    <div className=' w-[45%] flex flex-col justify-center items-center ring ring-indigo-600/40  rounded-sm p-0.5 '>
                          <div className='flex flex-col gap-1.5'>
                               <h2 className='text-3xl font-bold'>Hello, I'm Adeun!</h2>
                               <WaveBorderWrapper >
@@ -43,10 +42,10 @@ export default function Intro() {
 
                     </div>
                     {/* About me */}
-                    <div className=' flex flex-col gap-2 col-start-3 col-end-6 row-start-1 row-end-3 p-3  ring ring-indigo-600/40 rounded-sm '>
+                    <div className='w-[55%] flex flex-col gap-2 col-start-3 col-end-6 row-start-1 row-end-3 p-3  ring ring-indigo-600/40 rounded-sm '>
                          <h2 className='text-xl font-bold'>About Me</h2>
-                         <p className='text-lg'>
-                              <span className=' text-xl text-amber-600'>A</span> developer with a focused interest in web and software development and a forward-looking mindset about where technology is headed. I take pride in building clean, maintainable solutions—whether that means crafting responsive interfaces or implementing reliable backend systems. My approach combines technical precision with a strong sense of purpose, and I'm always eager to contribute to projects that prioritize innovation, usability, and long-term impact. I'm looking to connect with teams and organizations that value clear communication, thoughtful execution, and the drive to build meaningful digital experiences.
+                         <p className='text-2xl'>
+                              <span className=' text-3xl text-amber-600 '>A</span> developer with a focused interest in web and software development and a forward-looking mindset about where technology is headed. I take pride in building clean, maintainable solutions—whether that means crafting responsive interfaces or implementing reliable backend systems. My approach combines technical precision with a strong sense of purpose, and I'm always eager to contribute to projects that prioritize innovation, usability, and long-term impact. I'm looking to connect with teams and organizations that value clear communication, thoughtful execution, and the drive to build meaningful digital experiences.
 
                          </p>
                     </div>
@@ -56,8 +55,7 @@ export default function Intro() {
 
                <div className=' flex flex-col gap-1.5 ring ring-indigo-600/40 overflow-hidden rounded-sm p-2'>
                     <h1> skills and Technology</h1>
-
-                         <AnimatedTechnologies />
+                    <AnimatedTechnologies />
                </div>
 
 
@@ -69,17 +67,17 @@ export default function Intro() {
                     <div className=' flex flex-col gap-1.5'>
                          <h2 className='text-2xl font-extrabold'>Contact:</h2>
                          <div className=' flex flex-row justify-center items-center gap-2 '>
-                         {Contact.map(contact => {
-                              const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d{1,5})?(\/[^\s]*)?$/;
-                              const matches = urlRegex.test(contact.value)
-                              if (matches) {
-                                   return <UtilityCard name={contact.name} isLink={true} url={contact.value} Icon={contact.Icon} />
-                              } else {
-                                   return <UtilityCard name={contact.name} url={contact.value} isLink={false} Icon={contact.Icon} />
-                              }
+                              {Contact.map(contact => {
+                                   const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d{1,5})?(\/[^\s]*)?$/;
+                                   const matches = urlRegex.test(contact.value)
+                                   if (matches) {
+                                        return <UtilityCard name={contact.name} isLink={true} url={contact.value} Icon={contact.Icon} />
+                                   } else {
+                                        return <UtilityCard name={contact.name} url={contact.value} isLink={false} Icon={contact.Icon} />
+                                   }
 
-                         })}
-                    </div>
+                              })}
+                         </div>
                     </div>
 
 

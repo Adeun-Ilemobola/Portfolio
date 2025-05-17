@@ -5,6 +5,7 @@ import {
 
   Navigate,
   RouterProvider,
+  createRoute,
   createRouter,
 
 } from '@tanstack/react-router'
@@ -17,7 +18,15 @@ import CreateProjectRoutRoute from './routes/ADMIN/CreateProjectRout.tsx'
 import ProjectRoute from './routes/Project.tsx'
 
 
+const RedirectToClient =  createRoute({
+  getParentRoute: () => RootRoute,
+  path: '/', // this is the root path
+  component: () => <Navigate to={IndexRoute.to}/>,
+})
+
+
 const routeTree = RootRoute.addChildren([
+  RedirectToClient,
   IndexRoute , 
   AdminRoute,
   CreateProjectRoutRoute,
@@ -26,9 +35,8 @@ const routeTree = RootRoute.addChildren([
 ])
 
 const router = createRouter({ 
-  routeTree,
-  defaultPreload: 'intent',
-  defaultPendingComponent: () => <Navigate to={IndexRoute.to}/>,
+  routeTree
+
 })
 
 declare module '@tanstack/react-router' {

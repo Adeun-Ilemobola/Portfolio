@@ -4,6 +4,7 @@ import {
     DialogContent,
     DialogDescription,
     DialogHeader,
+    DialogOverlay,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
@@ -18,7 +19,7 @@ import { LoaderCircle } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface ContactCardProps {
-    children: React.ReactNode,
+    children?: React.ReactNode,
     showContact: boolean,
     setShowContact: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -82,12 +83,16 @@ export default function ContactCard({ children, setShowContact, showContact }: C
         makeMesage.mutate(data)
     }
     return (
-        <Dialog open={showContact} onOpenChange={setShowContact}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent>
+        <Dialog open={showContact} onOpenChange={setShowContact}  >
+            <DialogTrigger >{children}</DialogTrigger>
+            <DialogOverlay className="bg-black/50 backdrop-blur-md" />
+            <DialogContent className='!max-w-[50rem] w-full' >
                 <DialogHeader>
-                    <DialogTitle>Contact me by email</DialogTitle>
-                    <form onSubmit={handleSubmit} className=' flex gap-3 flex-col h-full justify-center  '>
+                    <DialogTitle className=' text-2xl'>Contact me by email</DialogTitle>
+
+                </DialogHeader>
+                <div className='flex flex-row justify-between items-center gap-2 '>
+                    <form onSubmit={handleSubmit} className='flex-1 w-full flex gap-3 flex-col  '>
 
                         <div className=' flex gap-1  flex-col justify-center items-center  '>
                             <div className=' flex flex-row gap-6 h-full justify-center w-full'>
@@ -124,7 +129,7 @@ export default function ContactCard({ children, setShowContact, showContact }: C
                         </div>
 
                         <div className=' flex flex-row justify-center items-center gap-3 '>
-                            <Button disabled={makeMesage.isPending} className='text-white bg-gradient-to-r from-indigo-600 to-blue-400 hover:from-pink-500 hover:to-purple-700' type='submit'>
+                            <Button disabled={makeMesage.isPending} variant={"outline"} type='submit'>
                                 Send
                                 {makeMesage.isPending && (<LoaderCircle className=' animate-spin' />)}
                             </Button>
@@ -134,8 +139,9 @@ export default function ContactCard({ children, setShowContact, showContact }: C
 
 
                     </form>
+                </div>
 
-                </DialogHeader>
+
             </DialogContent>
         </Dialog>
 

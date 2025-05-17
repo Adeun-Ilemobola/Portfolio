@@ -34,8 +34,8 @@ function Index() {
   });
   const [data, setData] = useState<{ message: string; timestamp: string } | null>(null);
   const [projects, setProjects] = useState<z.infer<typeof zPorject>[]>([]);
-       const [showContact, setShowContact] = useState(false)
-  
+  const [showContact, setShowContact] = useState(false)
+
 
 
   useEffect(() => {
@@ -58,32 +58,45 @@ function Index() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2.5  min-h-screen p-3">
+    <div className="flex flex-col items-center min-h-screen ">
+      <ContactCard setShowContact={setShowContact} showContact={showContact} >
 
-      <ContactCard   setShowContact={setShowContact} showContact={showContact} > 
-        <Button variant={"secondary"} onClick={()=> setShowContact(true)} className=' z-50 absolute bottom-0 right-0 m-4'>
-          Contact me
-        </Button>
       </ContactCard>
+       <div className=' flex flex-row w-full pt-1 pr-4'>
+          <Button onClick={() => setShowContact(true)} className=' ml-auto '>
+            Contact me
+          </Button>
+
+        </div>
 
 
-      <Intro />
-      <div className='flex-1 flex w-full flex-wrap gap-6 p-3 justify-center overflow-y-auto rounded-md   '>
-        {projects.map((project, index) => {
-          return (
-            <Link key={index} to={ProjectRoute.to} params={{ id: project.id ?? "" }} >
-             <ProjectCard
-              projectInfo={project}
-              ModifyMode={false}
-              del={(DelId) => { }}
-            />
-            </Link>
-           
+      <div className='flex flex-col gap-2.5 w-[72%]  min-h-screen p-3'>
+       
 
-          )
-        })}
+
+
+
+        <Intro />
+        <div className='flex-1 flex w-full flex-wrap gap-6 p-3 justify-center overflow-y-auto rounded-md   '>
+          {projects.map((project, index) => {
+            return (
+              <Link key={index} to={ProjectRoute.to} params={{ id: project.id ?? "" }} >
+                <ProjectCard
+                  projectInfo={project}
+                  ModifyMode={false}
+                  del={(DelId) => { }}
+                />
+              </Link>
+
+
+            )
+          })}
+
+        </div>
 
       </div>
+
+
 
 
 

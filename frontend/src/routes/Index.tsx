@@ -9,6 +9,8 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import ProjectCard from '@/components/ProjectCard';
 import ProjectRoute from './Project';
+import ContactCard from '@/components/ContactCard';
+import { Button } from '@/components/ui/button';
 
 
 function Index() {
@@ -32,6 +34,8 @@ function Index() {
   });
   const [data, setData] = useState<{ message: string; timestamp: string } | null>(null);
   const [projects, setProjects] = useState<z.infer<typeof zPorject>[]>([]);
+       const [showContact, setShowContact] = useState(false)
+  
 
 
   useEffect(() => {
@@ -54,13 +58,16 @@ function Index() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2.5  min-h-screen p-4">
+    <div className="flex flex-col gap-2.5  min-h-screen p-3">
+
+      <ContactCard   setShowContact={setShowContact} showContact={showContact} > 
+        <Button variant={"secondary"} onClick={()=> setShowContact(true)} className=' z-50 absolute bottom-0 right-0 m-4'>
+          Contact me
+        </Button>
+      </ContactCard>
+
+
       <Intro />
-
-      <div className='flex flex-row gap-2 ring-1 rounded-md ring-amber-200/30 justify-center items-center-safe w-full  h-[12rem]'>
-
-      </div>
-
       <div className='flex-1 flex w-full flex-wrap gap-6 p-3 justify-center overflow-y-auto rounded-md   '>
         {projects.map((project, index) => {
           return (

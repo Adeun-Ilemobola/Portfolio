@@ -61,6 +61,7 @@ export const useSessionStore = create<SessionStore>((set , get) =>({
         } catch (error) {
             console.error('Error setting session:', error);
             set({ isLoading: false });
+            
         }
     },
 }) )

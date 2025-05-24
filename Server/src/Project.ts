@@ -90,12 +90,15 @@ ProjectRoute.get("/", async (c) => {
 
 ProjectRoute.post('/', vProjectPost, async (c) => {
     try {
+        const validated = c.req.valid("json");
         console.log("POST PROJECT MAKE", {
             url: c.req.url,
-            db: process.env.DATABASE_URL!
+            db: process.env.DATABASE_URL!,
+            data:validated
+
         });;
 
-        const validated = c.req.valid("json");
+        
         if (!validated) {
             return c.text("Invalid data", 400);
         }
@@ -142,7 +145,7 @@ ProjectRoute.post('/', vProjectPost, async (c) => {
             publishedDate: createdProject.publishedDate ?? "",
             tool: tools,
             image: images
-        })
+        } , 200)
 
 
 

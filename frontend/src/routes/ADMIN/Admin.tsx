@@ -21,9 +21,7 @@ function Admin() {
   const { data: dbProjects, isLoading } = useQuery({
     queryKey: ['projectList'],
     queryFn: async () => {
-      toast.loading("Loading Projects", {
-
-      })
+      toast.loading("Loading Projects" ,{duration:3000})
       const content = await axios.get('/api/PROJECT');
       toast.dismiss();
       toast.success("Projects Loaded", {
@@ -32,7 +30,7 @@ function Admin() {
       return content.data;
     },
     select: (data) => z.array(zPorject).parse(data),
-    retry: 2
+    retry: 1
 
 
   });
@@ -43,10 +41,12 @@ function Admin() {
     },
     onSuccess: () => {
       // Invalidate and refetch
+       toast.dismiss();
       queryClient.invalidateQueries({ queryKey: ['projectList'] });
       toast.success("Project Deleted", {
         duration: 2000
       })
+       
     },
     retry: 2,
     onError: (error) => {
@@ -62,6 +62,7 @@ function Admin() {
 
   useEffect(() => {
     if (dbProjects) {
+       toast.dismiss();
       setProjects(dbProjects);
     }
   }, [dbProjects]);
@@ -91,7 +92,7 @@ function Admin() {
         {isLoading ?
           (
             <div className='flex gap-2 justify-center items-center-safe w-48 h-40'>
-              <LoaderCircle size={50} className='  animate-spin' />
+              <LoaderCircle size={50} className='text-4xl  animate-spin' />
               <h2 className='text-4xl'>Loading Projects</h2>
 
             </div>

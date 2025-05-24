@@ -58,6 +58,15 @@ export const sessions = pgTable('sessions', {
   region: varchar('region', { length: 128 }).notNull(),
   gps: varchar('gps', { length: 255 }).notNull(),
   token: varchar('token', { length: 255 }).notNull(),
+  adminId: varchar('adminId', { length: 36 }).notNull().references(() => admin.id),
+
 });
+
+export const admin = pgTable("admin_user" ,{
+   id: varchar('id', { length: 36 }).primaryKey(),
+   username: varchar('username', { length: 255 }).notNull(),
+   password_hash: varchar(' password_hash', { length: 255 }).notNull(),
+   
+})
   
   

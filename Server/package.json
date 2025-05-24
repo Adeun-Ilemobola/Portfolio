@@ -3,12 +3,13 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "dev-watch": "bun run --hot --watch src/index.ts",
-     "db:sync": "drizzle-kit generate && drizzle-kit migrate --config ./drizzle.config.ts"
-
+    "db:sync": "drizzle-kit generate && drizzle-kit migrate --config ./drizzle.config.ts"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.3",
+    "@types/bcrypt": "^5.0.2",
     "@types/luxon": "^3.6.2",
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
     "hono": "^4.7.5",

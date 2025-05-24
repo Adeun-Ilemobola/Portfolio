@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { getClientInfo } from './utils';
 
 interface SessionData {
-    data: {
+    
         id: string;
         name: string;
         date: string;
@@ -15,9 +15,11 @@ interface SessionData {
         country: string;
         city: string;
         region: string;
-        gps:string
+        gps:string;
+        adminId:string
 
-    };
+
+    
     token: string;
 }
 

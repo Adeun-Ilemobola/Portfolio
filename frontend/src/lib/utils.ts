@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-
+import platform from "platform";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -33,3 +33,23 @@ export const toB64 = (file: File): Promise<Base64FileResult> => {
     reader.readAsDataURL(file);
   });
 };
+
+
+ export const getClientInfo = async () => {
+  const ipInfo = await fetch('https://ipwho.is/').then(res => res.json());
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  return {
+    date: new Date().toISOString(),
+    ip: ipInfo.ip,
+    timezone,
+    browser: navigator.userAgent,
+    os: platform.os?.family || navigator.platform,
+    device: platform.description,
+    country: ipInfo.country,
+    city: ipInfo.city,
+    region: ipInfo.region,
+    gps: `${ipInfo.latitude},${ipInfo.longitude}`
+  };
+};
+ 

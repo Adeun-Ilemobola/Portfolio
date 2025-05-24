@@ -4,11 +4,7 @@ x-bun: &bun
   environment:
     NODE_ENV: development
     CHOKIDAR_USEPOLLING: "true"
-    FRONTEND_DIST: /workspace/frontend/dist
-    DATABASE_URL: "postgresql://postgres.mgmcrxxlvvkyigdlzids:7HeZhUPtRPQ8qJYN@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
-    GMAIL_USER: "ogzygunt@gmail.com"
-    GMAIL_PASS: "bhflamppqoowcexc"
-    GMAIL_SENDER: "ogzygunt@gmail.com"
+    env_file: .env 
 services:
   # ───────── Front‑end (Vite + React) ─────────
   frontend:

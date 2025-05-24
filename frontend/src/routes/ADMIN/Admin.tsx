@@ -87,21 +87,21 @@ function Admin() {
         </Link>
       </div>
 
-      <div className={`flex-1 flex w-full flex-wrap gap-3 p-4 justify-center overflow-y-auto ${isLoading ? 'justify-center items-center' : ''}`}>
+      <div className={`flex-1 flex w-full flex-wrap gap-3 p-4 justify-center overflow-y-auto ${isLoading || projects.length == 0  ? 'justify-center items-center' : ''}`}>
         {isLoading ?
           (
             <div className='flex gap-2 justify-center items-center-safe w-48 h-40'>
-              <LoaderCircle className=' text-2xl animate-spin' />
-              <h2 className='text-lg'>Loading Projects</h2>
+              <LoaderCircle size={50} className='  animate-spin' />
+              <h2 className='text-4xl'>Loading Projects</h2>
 
             </div>
           ) : (
             <>
               {projects.length == 0 &&
                 (
-                  <div className='flex gap-2 justify-center items-center-safe w-48 h-40'>
-                    <ShieldAlert className=' to-red-700' />
-                    <span className='text-lg'>Project not found</span>
+                  <div className='flex  gap-2 justify-center items-center-safe w-48 h-40'>
+                    <ShieldAlert size={50} className=' text-fuchsia-500' />
+                    <span className='text-4xl'>Project not found</span>
 
                   </div>
 

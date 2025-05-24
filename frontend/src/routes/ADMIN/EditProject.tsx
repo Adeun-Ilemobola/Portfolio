@@ -12,6 +12,7 @@ import { Link } from '@tanstack/react-router';
 import CreateProjectRoute from './CreateProjectRout';
 import { LoaderCircle, ShieldAlert } from 'lucide-react';
 import ProjestMakeEdit from '@/components/ProjestMaleEdit';
+import { SessionGuard } from '@/components/SessionGuard';
 type Project = z.infer<typeof zPorject>;
 
 function EditProject() {
@@ -163,8 +164,12 @@ function EditProject() {
 const EditProjectRoute = createRoute({
     getParentRoute: () => RootRoute,
     path: '/client/Admin/Project/$id',
-    component: EditProject
+    component: () => (<>
+        <SessionGuard>
+          <EditProject />
+        </SessionGuard>
+      
+        </>),
 });
-// Admin/Project/8obmxPWcOVxZUqOfX6W2L
 
 export default EditProjectRoute;

@@ -44,3 +44,17 @@ export const zContact = z.object({
     email: z.string().email(),
     message: z.string().min(3).max(500),
 })
+
+
+export const ClientInfoSchema = z.object({
+  date: z.string(),
+  ip: z.string(),
+  timezone: z.string(),
+  browser: z.string(),
+  os: z.string(),
+  device: z.string(),
+  country: z.string(),
+  city: z.string(),
+  region: z.string(),
+  gps: z.string(),
+});

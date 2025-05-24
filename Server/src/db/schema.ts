@@ -10,7 +10,9 @@ import {
     timestamp,
     serial,
   } from 'drizzle-orm/pg-core';
-  
+
+
+
   export const projects = pgTable('projects', {
     id: varchar('id', { length: 36 }).primaryKey(),
     name: varchar('name', { length: 255 }).notNull(),
@@ -37,5 +39,25 @@ import {
     name: varchar('name', { length: 100 }).notNull(),
     description: text('description').notNull(),
   });
+
+
+
+
+
+export const sessions = pgTable('sessions', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  date: varchar('date', { length: 255 }).notNull(),
+  ip: varchar('ip', { length: 64 }).notNull(),
+  timezone: varchar('timezone', { length: 64 }).notNull(),
+  browser: varchar('browser', { length: 128 }).notNull(),
+  os: varchar('os', { length: 128 }).notNull(),
+  device: varchar('device', { length: 128 }).notNull(),
+  country: varchar('country', { length: 128 }).notNull(),
+  city: varchar('city', { length: 128 }).notNull(),
+  region: varchar('region', { length: 128 }).notNull(),
+  gps: varchar('gps', { length: 255 }).notNull(),
+  token: varchar('token', { length: 255 }).notNull(),
+});
   
   

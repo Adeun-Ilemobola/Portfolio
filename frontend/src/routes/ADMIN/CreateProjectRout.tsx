@@ -11,6 +11,7 @@ import ProjestMakeEdit from '@/components/ProjestMaleEdit';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { SessionGuard } from '@/components/SessionGuard';
 type Project = z.infer<typeof zPorject>;
 
 function CreateProject() {
@@ -123,7 +124,13 @@ function CreateProject() {
 const CreateProjectRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: '/client/Admin/CreateProject',
-  component: CreateProject
+  component: () => (<>
+    <SessionGuard>
+      <CreateProject />
+    </SessionGuard>
+  
+    </>),
+  
 });
 
 export default CreateProjectRoute;

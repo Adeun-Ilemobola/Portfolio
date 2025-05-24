@@ -8,14 +8,15 @@ import { zValidator } from '@hono/zod-validator';
 import { sendEmail } from './email';
 import { z } from 'zod';
 import { DateTime } from "luxon";
+import SessionsRoute from './Sessions';
 const dist = process.env.FRONTEND_DIST ?? '../frontend/dist';
 const app = new Hono()
 app.use('*', logger());
 app.use('*', cors());
 // 🔒 Global middleware — runs before every route
 app.use('*', async (c, next) => {
-  console.log('Middleware ran for route:', c.req.path)
-  await next()
+    console.log('Middleware ran for route:', c.req.path)
+    await next()
 })
 
 console.log("Loaded DATABASE_URL:", process.env.DATABASE_URL);
@@ -27,6 +28,8 @@ const vValidateContent = zValidator(
 
 const apiRoutes = app.basePath('/api')
     .route("/PROJECT", ProjectRoute)
+    .route("/Session" ,SessionsRoute)
+    
     .post("/sendContact", vValidateContent, async (c) => {
         console.log("EMAIL ENV:", process.env.GMAIL_USER, process.env.GMAIL_PASS ? 'PASS SET' : 'NO PASS');
 
@@ -111,8 +114,8 @@ app.use('*', serveStatic({ root: dist }));
 app.get('*', serveStatic({ root: dist, path: 'index.html' }));
 
 app.onError((err, c) => {
-  console.error('Unhandled Error:', err)
-  return c.json({ error: 'Something went wrong.' }, 500)
+    console.error('Unhandled Error:', err)
+    return c.json({ error: 'Something went wrong.' }, 500)
 })
 
 

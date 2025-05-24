@@ -2,7 +2,9 @@
   "name": "Server",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "dev-watch": "bun run --hot --watch src/index.ts"
+    "dev-watch": "bun run --hot --watch src/index.ts",
+     "db:sync": "drizzle-kit generate && drizzle-kit migrate --config ./drizzle.config.ts"
+
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.3",
@@ -19,7 +21,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/nodemailer": "^6.4.17",
-    "drizzle-kit": "^0.31.0",
+    "drizzle-kit": "^0.31.1",
     "tsx": "^4.19.4"
   }
 }

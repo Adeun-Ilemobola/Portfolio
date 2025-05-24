@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { zPorject } from './ZodObject';
 import { zValidator } from '@hono/zod-validator'
-import { drizzle } from 'drizzle-orm/postgres-js';
 import { projects, projectTools, projectImages } from './db/schema';
 import { nanoid } from 'nanoid';
 import { eq } from "drizzle-orm";

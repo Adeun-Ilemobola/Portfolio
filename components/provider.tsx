@@ -56,7 +56,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
         {/* You can wrap with Suspense here for loading skeletons */}
          <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >

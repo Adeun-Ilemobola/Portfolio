@@ -7,6 +7,8 @@ import { ScanSearch } from 'lucide-react';
 import Nav from "@/components/Nav";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import Corner from "@/components/Corner";
+import BrickWall from "@/components/BrickWall";
 
 
 export default function Home() {
@@ -73,8 +75,28 @@ export default function Home() {
 
       </div>
 
-      <div className="w-full h-[95vh] border">
+      <div className="w-full h-[95vh] border p-6 flex flex-col gap-1.5 ">
         {/* the skill */}
+        {/* <Corner variant="start" size={20} color="red" />
+        <Corner variant="mid" size={20} color="red" />
+        <Corner variant="end" size={20} color="red" /> */}
+
+        <h1 className="ml-10 text-3xl font-bold">Skills and Technology</h1>
+
+        <div className="flex items-center justify-center w-full flex-1">
+
+          <BrickWall
+            list={[
+              ["HTML", "CSS", "JavaScript", "React", "Node.js"],
+              ["Python", "Django", "Flask", "SQL", "MongoDB"],
+              ["Git", "Docker", "Kubernetes", "AWS", "Azure"],
+              ["Tailwind CSS", "Bootstrap", "Material UI", "Next.js", "GraphQL"],
+              ["TypeScript", "Redux", "Express.js", "REST APIs", "WebSockets"]
+            ]}
+          />
+
+        </div>
+
 
 
       </div>

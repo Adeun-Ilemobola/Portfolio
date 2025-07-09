@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, boolean, integer  , json } from "drizzle-orm/pg-core";
-
+import { v4 as uuidv4 } from 'uuid';
 export const user = pgTable("user", {
-	id: text('id').primaryKey(),
+	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
 	emailVerified: boolean('email_verified').$defaultFn(() => false).notNull(),
@@ -15,7 +15,7 @@ export const user = pgTable("user", {
 });
 
 export const session = pgTable("session", {
-	id: text('id').primaryKey(),
+	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	expiresAt: timestamp('expires_at').notNull(),
 	token: text('token').notNull().unique(),
 	createdAt: timestamp('created_at').notNull(),
@@ -27,7 +27,7 @@ export const session = pgTable("session", {
 });
 
 export const account = pgTable("account", {
-	id: text('id').primaryKey(),
+	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	accountId: text('account_id').notNull(),
 	providerId: text('provider_id').notNull(),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
@@ -43,7 +43,7 @@ export const account = pgTable("account", {
 });
 
 export const verification = pgTable("verification", {
-	id: text('id').primaryKey(),
+id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	identifier: text('identifier').notNull(),
 	value: text('value').notNull(),
 	expiresAt: timestamp('expires_at').notNull(),
@@ -53,8 +53,8 @@ export const verification = pgTable("verification", {
 
 
 
-export const image = pgTable("image", {
-	id: text('id').primaryKey(),
+export const imagedb = pgTable("image", {
+	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	name: text('name').notNull(), // Name of the image file
 	url: text('url').notNull(),
 	size: integer('size').notNull(), // Size of the image in bytes
@@ -63,14 +63,14 @@ export const image = pgTable("image", {
 	supabaseID: text('supabase_id').notNull().unique(),
 	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
-	projectId:   text('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }).notNull(), // Reference to the project this image belongs to
+	projectId:   text('project_id').notNull().references(() => projectdb.id, { onDelete: 'cascade' }).notNull(), // Reference to the project this image belongs to
 
 
 })
 
 
-export const project = pgTable("project", {
-	id: text('id').primaryKey(),
+export const projectdb = pgTable("project", {
+	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	title: text('title').notNull(),	
 	description: text('description').notNull(),
 	images: text('image').notNull(), // URL or path to the project image
@@ -90,6 +90,43 @@ export const schema = {
 	session,
 	account,
 	verification,
-	image,
-	project
+	imagedb,
+	projectdb
 };
+
+
+/// ----------------- Zod Schemas ----------------- ///
+
+import { z } from 'zod';
+
+// ── Image ──────────────────────────────────────────────────────────────────────
+export const imageSchema = z.object({
+  id: z.string(),               // text UUID
+  name: z.string(),             // notNull text
+  url: z.string().url(),        // notNull text (valid URL)
+  size: z.number().int(),       // notNull integer
+  type: z.string(),             // notNull text (e.g. "image/png")
+  lastModified: z.date(),       // notNull timestamp
+  supabaseID: z.string(),       // notNull unique text
+  createdAt: z.date(),          // notNull timestamp
+  updatedAt: z.date(),          // notNull timestamp
+  projectId: z.string(),        // notNull text FK
+});
+export type Image = z.infer<typeof imageSchema>;
+
+
+// ── Project ───────────────────────────────────────────────────────────────────
+export const projectSchema = z.object({
+  id: z.string(),               // text UUID
+  title: z.string(),            // notNull text
+  description: z.string(),      // notNull text
+  images: z.string(),           // notNull text (URL or path)
+  createdAt: z.date(),          // notNull timestamp
+  updatedAt: z.date(),          // notNull timestamp
+  userId: z.string(),           // notNull text FK
+  isPublic: z.boolean(),        // notNull boolean
+  technologies: z.array(z.string()), // notNull JSON array
+  githubLink: z.string().url().optional(), // optional text
+  liveLink: z.string().url().optional(),   // optional text
+});
+export type Project = z.infer<typeof projectSchema>;

@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Corner from "@/components/Corner";
 import BrickWall from "@/components/BrickWall";
+import ProjectCard from "@/components/ProjectCard";
 
 
 export default function Home() {
@@ -102,8 +103,51 @@ export default function Home() {
       </div>
 
 
-      <div className="w-full h-[95vh] border">
+      <div className="w-full h-[95vh] border flex flex-col gap-4 p-4">
         {/* the project section */}
+
+        <h1 className="text-4xl font-bold text-center mt-6">Projects</h1>
+        <div className=" flex flex-row flex-wrap justify-center gap-5 ">
+          <ProjectCard
+            id="1"
+            title="Portfolio Website"
+           
+            tools={["HTML", "CSS", "JavaScript", "React"]}
+            devMode={true}
+          />
+          <ProjectCard
+            id="2"
+            title="E-commerce Platform"
+            
+            tools={["Next.js", "Node.js", "MongoDB"]}
+            devMode={true}
+          />
+          <ProjectCard
+            id="3"
+            title="Chat Application"
+         
+            tools={["React", "Node.js", "WebSockets"]}
+            devMode={true}
+          />
+          <ProjectCard
+            id="4"
+            title="Blog Platform"
+          
+            tools={["Django", "PostgreSQL", "Bootstrap"]}
+            devMode={true}
+          />
+          <ProjectCard
+            id="5"
+            title="Weather App"
+          
+            tools={["React", "Axios", "OpenWeatherMap API"]}
+            devMode={true}    
+            />
+            
+
+        </div>
+
+
       </div>
 
 

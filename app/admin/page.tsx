@@ -2,13 +2,26 @@
 
 import InputBox from '@/components/inputBox'
 import { Button } from '@/components/ui/button'
+import { authClient } from '@/lib/auth-client'
 import { useMutation } from '@tanstack/react-query'
 import { LoaderCircle } from 'lucide-react'
 import React from 'react'
 import { toast } from 'sonner'
-
+import { z } from 'zod'
+const  zLogin = z.object({
+    email: z.string().email(),
+    password: z.string().min(6, "Password must be at least 6 characters long"),
+})
+const zRegister = z.object({
+    email: z.string().email(),
+    password: z.string().min(6, "Password must be at least 6 characters long"),
+    confirmPassword: z.string().min(6, "Confirm Password must be at least 6 characters long"),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match"}
+)
 export default function Page() {
     const [mode, setMode] = React.useState<'login' | 'register'>('login')
+    const [loading , setLoading] = React.useState(false)
     return (
         <div className='flex flex-col m-auto max-w-[85rem] min-w-[85rem] justify-center items-center min-h-screen relative'>
             <div className='flex flex-col items-center justify-center w-2xl '>
@@ -16,7 +29,7 @@ export default function Page() {
                     {mode === 'login' ? 'Register' : 'Login'}
                 </Button>
 
-                {mode === 'login' ? <Login /> : <Register />}
+                {mode === 'login' ? <Login setLoading={setLoading} /> : <Register setMode={setMode} />}
             </div>
 
         </div>
@@ -24,7 +37,7 @@ export default function Page() {
 }
 
 
-function Login() {
+function Login({ setLoading}:{setLoading: React.Dispatch<React.SetStateAction<boolean>>}) {
     const [loginData, setLoginData] = React.useState({
         email: '',
         password: ''
@@ -32,6 +45,13 @@ function Login() {
     const mLogin = useMutation({
         mutationFn: async (data: { email: string; password: string }) => {
             // Replace with your login API call
+            authClient.signIn.email({
+                email: data.email,
+                password: data.password,
+                callbackURL: `${window.location.origin}/admin/dashboard`,
+            },
+           
+        )  
 
             return new Promise((resolve) => setTimeout(resolve, 1000));
         },
@@ -44,6 +64,11 @@ function Login() {
     })
     const handleLogin = () => {
         // this kicks off the mutation and gives us back a Promise
+        const loginValidation = zLogin.safeParse(loginData);
+        if (!loginValidation.success) {
+            toast.error(`Login failed: ${loginValidation.error.message}`);
+            return;
+        }   
         const p = mLogin.mutateAsync({ ...loginData })
 
         // wrap it in toast.promise
@@ -52,6 +77,11 @@ function Login() {
             success: 'Welcome back!',
             error: (err) => `Login failed: ${err.message}`,
         })
+        setLoginData({
+            email: '',
+            password: ''
+        });
+        setLoading(true);
     }
 
     return (
@@ -87,7 +117,7 @@ function Login() {
 
 }
 
-function Register() {
+function Register({setMode}:{setMode: React.Dispatch<React.SetStateAction<"login" | "register">>}) {
     // Registration logic goes here
     // You can use a similar approach as in the Login component
     const [registerData, setRegisterData] = React.useState({
@@ -98,6 +128,19 @@ function Register() {
     const mRegister = useMutation({
         mutationFn: async (data: { email: string; password: string; confirmPassword: string }) => {
             // Replace with your registration API call
+            await authClient.signUp.email({
+                email: data.email,
+                password: data.password,
+                name: data.email.split('@')[0], // Example: use email prefix as name
+                
+            },
+            {
+                onSuccess(context) {
+                    console.log('Registration successful:', context);
+                    setMode('login'); // Switch to login mode after successful registration
+                },
+            }
+        )
 
             return new Promise((resolve) => setTimeout(resolve, 1000));
         },
@@ -110,6 +153,11 @@ function Register() {
     })
     const handleRegister = () => {
         // this kicks off the mutation and gives us back a Promise
+        const registerValidation = zRegister.safeParse(registerData);
+        if (!registerValidation.success) {
+            toast.error(`Registration failed: ${registerValidation.error.message}`);
+            return;
+        }
         const p = mRegister.mutateAsync({ ...registerData })
 
         // wrap it in toast.promise
@@ -118,6 +166,11 @@ function Register() {
             success: 'Registration successful!',
             error: (err) => `Registration failed: ${err.message}`,
         })
+        setRegisterData({
+            email: '',
+            password: '',
+            confirmPassword: ''
+        });
     }
     return (
         <>

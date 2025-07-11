@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, integer  , json } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, json } from "drizzle-orm/pg-core";
 import { v4 as uuidv4 } from 'uuid';
 export const user = pgTable("user", {
 	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
@@ -43,7 +43,7 @@ export const account = pgTable("account", {
 });
 
 export const verification = pgTable("verification", {
-id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
+	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	identifier: text('identifier').notNull(),
 	value: text('value').notNull(),
 	expiresAt: timestamp('expires_at').notNull(),
@@ -63,25 +63,19 @@ export const imagedb = pgTable("image", {
 	supabaseID: text('supabase_id').notNull().unique(),
 	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
-	projectId:   text('project_id').notNull().references(() => projectdb.id, { onDelete: 'cascade' }).notNull(), // Reference to the project this image belongs to
-
-
+	projectId: text('project_id').notNull().references(() => projectdb.id, { onDelete: 'cascade' }).notNull(), // Reference to the project this image belongs to
 })
-
-
 export const projectdb = pgTable("project", {
 	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
-	title: text('title').notNull(),	
+	title: text('title').notNull(),
 	description: text('description').notNull(),
-	images: text('image').notNull(), // URL or path to the project image
 	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
 	isPublic: boolean('is_public').$defaultFn(() => true).notNull(),
-    technologies:  json('technologies',).notNull(),
- 	githubLink: text('github_link'), // Link to the GitHub repository
+	technologies: json('technologies').$type<string[]>().$defaultFn(() => []).notNull(),
+	githubLink: text('github_link'), // Link to the GitHub repository
 	liveLink: text('live_link'), // Link to the live project
-	
 })
 
 
@@ -101,32 +95,59 @@ import { z } from 'zod';
 
 // ── Image ──────────────────────────────────────────────────────────────────────
 export const imageSchema = z.object({
-  id: z.string(),               // text UUID
-  name: z.string(),             // notNull text
-  url: z.string().url(),        // notNull text (valid URL)
-  size: z.number().int(),       // notNull integer
-  type: z.string(),             // notNull text (e.g. "image/png")
-  lastModified: z.date(),       // notNull timestamp
-  supabaseID: z.string(),       // notNull unique text
-  createdAt: z.date(),          // notNull timestamp
-  updatedAt: z.date(),          // notNull timestamp
-  projectId: z.string(),        // notNull text FK
+	id: z.string(),               // text UUID
+	name: z.string(),             // notNull text
+	url: z.string().url(),        // notNull text (valid URL)
+	size: z.number().int(),       // notNull integer
+	type: z.string(),             // notNull text (e.g. "image/png")
+	lastModified: z.date(),       // notNull timestamp
+	supabaseID: z.string(),       // notNull unique text
+	createdAt: z.date(),          // notNull timestamp
+	updatedAt: z.date(),          // notNull timestamp
+	projectId: z.string().default(""),        // notNull text FK
 });
 export type Image = z.infer<typeof imageSchema>;
 
 
 // ── Project ───────────────────────────────────────────────────────────────────
 export const projectSchema = z.object({
-  id: z.string(),               // text UUID
-  title: z.string(),            // notNull text
-  description: z.string(),      // notNull text
-  images: z.string(),           // notNull text (URL or path)
-  createdAt: z.date(),          // notNull timestamp
-  updatedAt: z.date(),          // notNull timestamp
-  userId: z.string(),           // notNull text FK
-  isPublic: z.boolean(),        // notNull boolean
-  technologies: z.array(z.string()), // notNull JSON array
-  githubLink: z.string().url().optional(), // optional text
-  liveLink: z.string().url().optional(),   // optional text
+	id: z.string(),               // text UUID
+	title: z.string(),            // notNull text
+	description: z.string(),      // notNull text
+
+	createdAt: z.date(),          // notNull timestamp
+	updatedAt: z.date(),          // notNull timestamp
+	userId: z.string(),           // notNull text FK
+	isPublic: z.boolean(),        // notNull boolean
+	technologies: z.array(z.string()), // notNull JSON array
+	githubLink: z.string().url(), // optional text
+	liveLink: z.string().url()   // optional text
 });
 export type Project = z.infer<typeof projectSchema>;
+export const defaultImage: Image = {
+  id: '',
+  name: '',
+  url: '',
+  size: 0,
+  type: '',
+  lastModified: new Date(),
+  supabaseID: '',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  projectId: '',    // your FK default
+}
+
+//–– a blank Project
+export const defaultProject: Project = {
+  id: '',
+  title: '',
+  description: '',
+ 
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  userId: '',
+  isPublic: false,
+  technologies: [], // empty array
+  githubLink: '',
+  liveLink: '',
+}

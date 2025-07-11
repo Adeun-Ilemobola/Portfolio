@@ -15,6 +15,13 @@
       "when": 1751740838676,
       "tag": "0001_ambitious_ben_urich",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752274170494,
+      "tag": "0002_material_vision",
+      "breakpoints": true
     }
   ]
 }

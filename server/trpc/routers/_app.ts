@@ -62,12 +62,22 @@ export const appRouter = createTRPCRouter({
                     const { limit, offset } = input;
                     const projects = await db.select().from(projectdb).limit(limit).offset(offset);
                     if (!projects || projects.length === 0) {
-                        return { success: false, data: "No projects found" };
+                        return { success: false, data: null};
                     }
-                    return { success: true, data: projects };
+                    return { 
+                        success: true, 
+                        data: projects.map(project => ({
+                        id: project.id,
+                        title: project.title,
+                        tools: project.technologies || [], // Assuming technologies is an array of tools
+                    }))
+                          
+
+
+                    };
                 } catch (error) {
                     console.error("Error fetching projects:", error);
-                    return { success: false, error: "Failed to fetch projects" };
+                    return { success: false, data: null };
                 }
             }),   
             

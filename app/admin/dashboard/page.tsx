@@ -14,10 +14,12 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { FileUploadResult } from '@/lib/utils'
-import { DeleteImages } from '@/lib/supabase'
-import { defaultProject, Project } from '@/lib/auth-schema'
+import { DeleteImages, UploadImageList } from '@/lib/supabase'
+import { defaultProject, Project, projectSchema } from '@/lib/auth-schema'
 import InputBox, { SelectBox, SelectorBox, TextAreaBox } from '@/components/inputBox'
 import MultipleSelector from '@/components/MultipleSelector'
+import { authClient } from '@/lib/auth-client'
+import ImageDragDrop from '@/components/img'
 
 
 interface ProjectModeProps {
@@ -138,10 +140,30 @@ export default function Page() {
 
 function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModProps) {
     // Logic for project creation or update modal
-    let uploadedImages: FileUploadResult[] = [];
+    const [images, setImages] = React.useState<FileUploadResult[]>([]);
+    const Session = authClient.useSession();
+
+
 
     async function onSuccess() {
+        if (!Session || !Session.data?.user.id) {
+            toast.error("User session not found. Please log in.");
+            return;
+        }
+        let uploadedImages: FileUploadResult[] = [];
         try {
+            const vProject = await projectSchema.safeParseAsync(project);
+            if (vProject.error?.errors) {
+                vProject.error?.errors.forEach((error) => {
+                    toast.error(`Validation error: ${error.message}`);
+                });
+                return;
+            }
+            const imagesToUpload = images.filter(img => !img.supabaseID || img.supabaseID === "");
+            uploadedImages = await UploadImageList(imagesToUpload, Session.data?.user.id);
+            const uploadedImageToCL = images.filter(img => img.supabaseID && img.supabaseID !== "")
+
+
 
         } catch (error) {
             console.error(`Error during project ${config.mode}:`, error);
@@ -151,9 +173,9 @@ function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModPr
 
 
 
-            if  (config.mode === "create") {
+            if (config.mode === "create") {
                 setProjectInfo(defaultProject); // Reset project info for new project creation
-            }else if (config.mode === "update") {
+            } else if (config.mode === "update") {
                 setProjectInfo(null); // Reset project info for update
             }
 
@@ -231,8 +253,18 @@ function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModPr
                             onChange={(e) => setProjectInfo({ ...project, description: e })}
                             placeholder="Enter project description"
                         />
+                        <ImageDragDrop
+                            images={images}
+                            setImages={setImages}
+                            DeleteImages={async (paths) => {
+                                // Logic to delete images from Supabase
+                                console.log("Deleting images:", paths);
+                                await DeleteImages(paths);
+                            }}
 
-                     
+                        />
+
+
 
 
 

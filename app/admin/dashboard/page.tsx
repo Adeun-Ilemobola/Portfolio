@@ -2,7 +2,6 @@
 import ProjectCard from '@/components/ProjectCard'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/trpc'
-import Link from 'next/link'
 import React from 'react'
 import { toast } from 'sonner'
 import {
@@ -15,11 +14,11 @@ import {
 } from "@/components/ui/dialog"
 import { FileUploadResult } from '@/lib/utils'
 import { DeleteImages, UploadImageList } from '@/lib/supabase'
-import { defaultProject, Project, projectSchema } from '@/lib/auth-schema'
+import { defaultImage, defaultProject, Image, imageSchema, Project, projectSchema } from '@/lib/auth-schema'
 import InputBox, { SelectBox, SelectorBox, TextAreaBox } from '@/components/inputBox'
-import MultipleSelector from '@/components/MultipleSelector'
 import { authClient } from '@/lib/auth-client'
 import ImageDragDrop from '@/components/img'
+import { set } from 'zod'
 
 
 interface ProjectModeProps {
@@ -34,6 +33,7 @@ interface ProjectModProps {
     onUpdate?: () => void;
     project: Project;
     setProjectInfo: React.Dispatch<React.SetStateAction<Project | null>>;
+    reFresh: () => void
 }
 
 
@@ -79,7 +79,10 @@ export default function Page() {
                     variant="destructive"
                     onClick={() => {
                         // Logic to handle logout
+                        authClient.signOut();
+                        toast.success("Logged out successfully");
                         console.log("Logout clicked");
+                        window.location.href = "/"; // Redirect to home page after logout
                     }}
                 >
                     Logout
@@ -129,6 +132,7 @@ export default function Page() {
                     }}
                     project={projectInfo} // Assuming a project object is passed here
                     setProjectInfo={setProjectInfo}
+                    reFresh={() => { getProjectsRest.refetch() }}
 
                 />
             )}
@@ -138,16 +142,44 @@ export default function Page() {
 }
 
 
-function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModProps) {
+function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: ProjectModProps) {
     // Logic for project creation or update modal
     const [images, setImages] = React.useState<FileUploadResult[]>([]);
+    const [isUploading, setUploading] = React.useState(false);
     const Session = authClient.useSession();
+    const createProject = api.createProject.useMutation({
+        onSuccess(data, variables) {
+            if (data.success) {
+                toast.success(data.meg)
+                  setConfig({ ...config, show: false });
+                reFresh();
+            } else if (!data.success) {
+                toast.error(data.meg);
+                if (variables.images.length > 0) {
+                    DeleteImages(variables.images.map(op => (op.supabaseID)))
+                }
+            }
+             setUploading(false);
+        },
+        onError(error, variables, context) {
+            toast.error(error.message);
+            if (variables.images.length > 0) {
+                DeleteImages(variables.images.map(op => (op.supabaseID)))
+            }
+            setUploading(false);
+        },
+    })
+    const DisableInputs = createProject.isPending || isUploading;
 
 
 
     async function onSuccess() {
+        setUploading(true);
         if (!Session || !Session.data?.user.id) {
             toast.error("User session not found. Please log in.");
+            console.log("User session not found. Please log in.");
+            
+            setUploading(false);
             return;
         }
         let uploadedImages: FileUploadResult[] = [];
@@ -157,33 +189,57 @@ function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModPr
                 vProject.error?.errors.forEach((error) => {
                     toast.error(`Validation error: ${error.message}`);
                 });
+                setUploading(false);
                 return;
             }
+            console.log("Project validated successfully:", vProject.data);
+
+            
             const imagesToUpload = images.filter(img => !img.supabaseID || img.supabaseID === "");
             uploadedImages = await UploadImageList(imagesToUpload, Session.data?.user.id);
-            const uploadedImageToCL = images.filter(img => img.supabaseID && img.supabaseID !== "")
+            const uploadedImageToDB: Image[] = uploadedImages.map(img => ({
+                ...img,
+                id: "",
+                projectId: "",
+                lastModified: new Date(img.lastModified)
+            }))
+         
+
+            if (config.mode === "create") {
+                console.log("send data to create project", project, uploadedImageToDB);
+                
+                const r = createProject.mutateAsync({
+                    project: {
+                        ...project,
+                      
+                    },
+                    images: [...uploadedImageToDB]
+                })
+                toast.promise(r, {
+                    loading: 'Creating project…',
+                    success: 'Process finished',
+                    error: (err) => `project failed: ${err.message}`,
+                })
+                setProjectInfo(defaultProject); // Reset project info for new project creation
+            } else if (config.mode === "update") {
+                setProjectInfo(null); // Reset project info for update
+            }
+             setUploading(false);
 
 
 
         } catch (error) {
             console.error(`Error during project ${config.mode}:`, error);
             toast.error(`Failed to ${config.mode} project`);
-            await DeleteImages(uploadedImages.map(img => img.supabaseID));
-
-
-
-
-            if (config.mode === "create") {
-                setProjectInfo(defaultProject); // Reset project info for new project creation
-            } else if (config.mode === "update") {
-                setProjectInfo(null); // Reset project info for update
+            if (uploadedImages.length > 0){
+                await DeleteImages(uploadedImages.map(img => img.supabaseID));
             }
 
-            setConfig({ ...config, show: false });
 
         }
+        setUploading(false);
 
-        setConfig({ ...config, show: false });
+      
 
     }
     return (
@@ -199,25 +255,28 @@ function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModPr
                     <DialogTitle>
                         {config.mode === "create" ? "Create New Project" : "Update Project"}
                     </DialogTitle>
-                    <DialogDescription className=' flex flex-col gap-3 p-6'>
-                        <div className='flex flex-col gap-4'>
+                    <DialogDescription className=' flex flex-col gap-2 p-3'>
+                        <div className='grid grid-cols-2 gap-3'>
                             <InputBox
                                 label="Project Title"
                                 placeholder="Enter project title"
                                 value={project.title}
                                 onChange={(e) => setProjectInfo({ ...project, title: e })}
+                                 disabled={DisableInputs}
                             />
                             <InputBox
                                 label="github Link"
                                 placeholder="Enter GitHub link"
                                 value={project.githubLink || ''}
                                 onChange={(e) => setProjectInfo({ ...project, githubLink: e })}
+                                 disabled={DisableInputs}
                             />
                             <InputBox
                                 label="Live Link"
                                 placeholder="Enter live project link"
                                 value={project.liveLink || ''}
                                 onChange={(e) => setProjectInfo({ ...project, liveLink: e })}
+                                 disabled={DisableInputs}
                             />
                             <SelectBox
                                 label=" is Public"
@@ -227,6 +286,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModPr
                                     { value: "true", label: "Public" },
                                     { value: "false", label: "Private" }
                                 ]}
+                                disabled={DisableInputs}
                             />
                         </div>
                         <SelectorBox
@@ -246,12 +306,14 @@ function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModPr
                                 { value: "Chakra UI", label: "Chakra UI" },
                             ]}
                             placeholder='Select technologies used in the project'
+                             disabled={DisableInputs}
                         />
                         <TextAreaBox
                             label="Project Description"
                             value={project.description}
                             onChange={(e) => setProjectInfo({ ...project, description: e })}
                             placeholder="Enter project description"
+                             disabled={DisableInputs}
                         />
                         <ImageDragDrop
                             images={images}
@@ -261,8 +323,19 @@ function ProjectMod({ config, setConfig, setProjectInfo, project }: ProjectModPr
                                 console.log("Deleting images:", paths);
                                 await DeleteImages(paths);
                             }}
+                            
 
                         />
+
+                        <Button
+                            className='w-full'
+                            onClick={ () => {
+                                 onSuccess();
+                            }}
+                            disabled={DisableInputs}
+                        >
+                            {config.mode === "create" ? ( DisableInputs ? "Creating Project..." : "Create Project"): ( DisableInputs ? "Updating Project..." : "Update Project")}
+                        </Button>
 
 
 

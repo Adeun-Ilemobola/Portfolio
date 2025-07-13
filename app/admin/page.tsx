@@ -1,14 +1,14 @@
 "use client"
-
 import InputBox from '@/components/inputBox'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { useMutation } from '@tanstack/react-query'
 import { LoaderCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation' 
 import React from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
-const  zLogin = z.object({
+const zLogin = z.object({
     email: z.string().email(),
     password: z.string().min(6, "Password must be at least 6 characters long"),
 })
@@ -17,11 +17,16 @@ const zRegister = z.object({
     password: z.string().min(6, "Password must be at least 6 characters long"),
     confirmPassword: z.string().min(6, "Confirm Password must be at least 6 characters long"),
 }).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match"}
+    message: "Passwords don't match"
+}
 )
 export default function Page() {
+    const navigate = useRouter();
     const [mode, setMode] = React.useState<'login' | 'register'>('login')
-    const [loading , setLoading] = React.useState(false)
+    const [loading, setLoading] = React.useState(false)
+    function Go(path:string) {
+        navigate.push(path);   
+    }
     return (
         <div className='flex flex-col m-auto max-w-[85rem] min-w-[85rem] justify-center items-center min-h-screen relative'>
             <div className='flex flex-col items-center justify-center w-2xl '>
@@ -29,7 +34,7 @@ export default function Page() {
                     {mode === 'login' ? 'Register' : 'Login'}
                 </Button>
 
-                {mode === 'login' ? <Login setLoading={setLoading} /> : <Register setMode={setMode} />}
+                {mode === 'login' ? <Login setLoading={setLoading} push={Go} /> : <Register setMode={setMode} />}
             </div>
 
         </div>
@@ -37,7 +42,8 @@ export default function Page() {
 }
 
 
-function Login({ setLoading}:{setLoading: React.Dispatch<React.SetStateAction<boolean>>}) {
+function Login({ setLoading , push }: { setLoading: React.Dispatch<React.SetStateAction<boolean>> , push: (path: string) => void }) {
+    
     const [loginData, setLoginData] = React.useState({
         email: '',
         password: ''
@@ -45,43 +51,53 @@ function Login({ setLoading}:{setLoading: React.Dispatch<React.SetStateAction<bo
     const mLogin = useMutation({
         mutationFn: async (data: { email: string; password: string }) => {
             // Replace with your login API call
-            authClient.signIn.email({
-                email: data.email,
-                password: data.password,
-                callbackURL: `${window.location.origin}/admin/dashboard`,
-            },
-           
-        )  
+            try {
+                const s = authClient.signIn.email({
+                    email: data.email,
+                    password: data.password,
+                  
+                })
+                // wrap it in toast.promise
+                toast.promise(s, {
+                    loading: 'Logging in…',
+                    success: 'Welcome back!',
+                    error: (err) => `Login failed: ${err.message}`,
+                })
+                push('/admin/dashboard'); // Redirect to dashboard after successful login
+                return
 
-            return new Promise((resolve) => setTimeout(resolve, 1000));
+
+
+
+
+            } catch (error) {
+                console.error('Login failed:', error);
+                toast.error(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+            }
         },
-        onSuccess: () => {
-            console.log('Login successful');
-        },
+
         onError: (error) => {
             console.error('Login failed:', error);
         }
     })
-    const handleLogin = () => {
+    const handleLogin = async () => {
         // this kicks off the mutation and gives us back a Promise
+        setLoading(true);
         const loginValidation = zLogin.safeParse(loginData);
         if (!loginValidation.success) {
             toast.error(`Login failed: ${loginValidation.error.message}`);
             return;
-        }   
-        const p = mLogin.mutateAsync({ ...loginData })
+        }
+        await mLogin.mutateAsync({ ...loginData })
+        new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // wrap it in toast.promise
-        toast.promise(p, {
-            loading: 'Logging in…',
-            success: 'Welcome back!',
-            error: (err) => `Login failed: ${err.message}`,
-        })
         setLoginData({
             email: '',
             password: ''
         });
-        setLoading(true);
+        setLoading(false);
+
     }
 
     return (
@@ -89,24 +105,24 @@ function Login({ setLoading}:{setLoading: React.Dispatch<React.SetStateAction<bo
         <>
 
             <h1 className='text-3xl font-bold mb-4'>Login</h1>
-             <div className='flex flex-col gap-4 w-full justify-center items-center'>
-            <InputBox
-                label='Email'
-                type='email'
-                value={loginData.email}
-                onChange={(e) => setLoginData({ ...loginData, email: e })}
-                placeholder='Enter your email'
-                className='w-full max-w-md'
+            <div className='flex flex-col gap-4 w-full justify-center items-center'>
+                <InputBox
+                    label='Email'
+                    type='email'
+                    value={loginData.email}
+                    onChange={(e) => setLoginData({ ...loginData, email: e })}
+                    placeholder='Enter your email'
+                    className='w-full max-w-md'
 
-            />
-            <InputBox
-                label='Password'
-                type='password'
-                value={loginData.password}
-                onChange={(e) => setLoginData({ ...loginData, password: e })}
-                placeholder='Enter your password'
-                className='w-full max-w-md'
-            />
+                />
+                <InputBox
+                    label='Password'
+                    type='password'
+                    value={loginData.password}
+                    onChange={(e) => setLoginData({ ...loginData, password: e })}
+                    placeholder='Enter your password'
+                    className='w-full max-w-md'
+                />
             </div>
             <Button onClick={handleLogin} className='mt-4'>
                 {mLogin.isPending ? (<> <LoaderCircle className=" animate-spin" />{'Logging in...'}</>) : 'Login'}
@@ -117,7 +133,7 @@ function Login({ setLoading}:{setLoading: React.Dispatch<React.SetStateAction<bo
 
 }
 
-function Register({setMode}:{setMode: React.Dispatch<React.SetStateAction<"login" | "register">>}) {
+function Register({ setMode }: { setMode: React.Dispatch<React.SetStateAction<"login" | "register">> }) {
     // Registration logic goes here
     // You can use a similar approach as in the Login component
     const [registerData, setRegisterData] = React.useState({
@@ -132,15 +148,15 @@ function Register({setMode}:{setMode: React.Dispatch<React.SetStateAction<"login
                 email: data.email,
                 password: data.password,
                 name: data.email.split('@')[0], // Example: use email prefix as name
-                
+
             },
-            {
-                onSuccess(context) {
-                    console.log('Registration successful:', context);
-                    setMode('login'); // Switch to login mode after successful registration
-                },
-            }
-        )
+                {
+                    onSuccess(context) {
+                        console.log('Registration successful:', context);
+                        setMode('login'); // Switch to login mode after successful registration
+                    },
+                }
+            )
 
             return new Promise((resolve) => setTimeout(resolve, 1000));
         },
@@ -178,33 +194,33 @@ function Register({setMode}:{setMode: React.Dispatch<React.SetStateAction<"login
             {/* Add your registration form here */}
             <div className='flex flex-col gap-4 w-full justify-center items-center'>
 
-           
 
-            <InputBox
-                label='Email'
-                type='email'
-                value={registerData.email}
-                onChange={(e) => setRegisterData({ ...registerData, email: e })}
-                placeholder='Enter your email'
-                className='w-full max-w-md'
-            />
-            <InputBox
-                label='Password'
-                type='password'
-                value={registerData.password}
-                onChange={(e) => setRegisterData({ ...registerData, password: e })}
-                placeholder='Enter your password'
-                className='w-full max-w-md'
-            />
-            <InputBox
-                label='Confirm Password'
-                type='password'
-                value={registerData.confirmPassword}
-                onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e })}
-                placeholder='Confirm your password'
-                className='w-full max-w-md'
-            />
-             </div>
+
+                <InputBox
+                    label='Email'
+                    type='email'
+                    value={registerData.email}
+                    onChange={(e) => setRegisterData({ ...registerData, email: e })}
+                    placeholder='Enter your email'
+                    className='w-full max-w-md'
+                />
+                <InputBox
+                    label='Password'
+                    type='password'
+                    value={registerData.password}
+                    onChange={(e) => setRegisterData({ ...registerData, password: e })}
+                    placeholder='Enter your password'
+                    className='w-full max-w-md'
+                />
+                <InputBox
+                    label='Confirm Password'
+                    type='password'
+                    value={registerData.confirmPassword}
+                    onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e })}
+                    placeholder='Confirm your password'
+                    className='w-full max-w-md'
+                />
+            </div>
             <Button onClick={handleRegister} className='mt-4'>
                 {mRegister.isPending ? (<> <LoaderCircle className=" animate-spin" />
                     {'Registering...'}</>) : 'Register'}

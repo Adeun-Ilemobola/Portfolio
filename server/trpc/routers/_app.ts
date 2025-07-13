@@ -1,7 +1,7 @@
 import { array, z } from 'zod';
-import { createTRPCRouter, baseProcedure } from '../init';
+import { createTRPCRouter, baseProcedure, protectedProcedure } from '../init';
 import { create } from 'domain';
-import { projectdb, projectSchema, imageSchema, imagedb  } from '@/lib/auth-schema';
+import { projectdb, projectSchema, imageSchema, imagedb, projectCreateSchema, imageCreateSchema  } from '@/lib/auth-schema';
 import { clean } from 'better-auth/react';
 import db from '@/lib/database';
 import { eq } from 'drizzle-orm'
@@ -13,38 +13,41 @@ export const appRouter = createTRPCRouter({
 
 
     createProject:
-        baseProcedure
+        protectedProcedure
             .input(
                 z.object({
-                    project: projectSchema, // Use the Zod schema for input validation
-                    images: z.array(imageSchema) // Optional array of images
+                    project: projectCreateSchema, // Use the Zod schema for input validation
+                    images: z.array(imageCreateSchema) // Optional array of images
                 })
             )
-            .mutation(async ({ input }) => {
+            .mutation(async ({ input , ctx }) => {
                 try {
                     // Logic to create a new project in the database
                     // This is where you would interact with your database to save the project
+                    const { user } = ctx;
                     const { project, images } = input;
-                    const { id, ...cleanProject } = project; // Clean the project object to remove the id field if needed
-                    const cleanedImages = images.map(image => {
-                        const { id, ...cleanImage } = image; // Clean each image object to remove the id field if needed
-                        return cleanImage;
-                    });
 
-                    const [newProject] = await db.insert(projectdb).values(cleanProject).returning();
+                    console.log("Finish the cleanup for my project and the images", project, images);
+                    
+
+                    const [newProject] = await db.insert(projectdb).values({...project , userId: user.id}).returning();
                     if (!newProject) {
-                       return { success: false, data: "Failed to create project" };
+                       return { success: false, meg: "Failed to create project" };
                     }
-                    const newImgages = await db.insert(imagedb).values(cleanedImages.map(image => ({ ...image, projectId: newProject.id })));
+                    console.log("New project created:", newProject);
+                    
+                    const newImgages = await db.insert(imagedb).values(images.map(image => ({ ...image, projectId: newProject.id }))).returning();
                     if (!newImgages || newImgages.length === 0) {
-                        return { success: false, data: "Failed to create images" };
+                        return { success: false, meg: "Failed to create images" };
                     }
 
+                    console.log("New images created:", newImgages);
 
-                    return { success: true, data: "" }; // Replace with actual project ID
+
+                    return { success: true, meg: "Successfully created project" }; // Replace with actual project ID
                 } catch (error) {
                     console.error("Error creating project:", error);
-                    return { success: false, error: "Failed to create project" };
+                    return { success: false, meg: "Failed to create project" };
 
                 }
 

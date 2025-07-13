@@ -2,15 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { X } from 'lucide-react';
-
-interface FileUploadResult {
-  supabaseID: string;
-  name: string;
-  url: string;
-  size: number; // in bytes
-  type: string;
-  lastModified: number;
-}
+import { FileUploadResult, toB64 } from '@/lib/utils';
 
 interface ImageDragDropProps {
   images: FileUploadResult[];
@@ -22,15 +14,11 @@ interface ImageDragDropProps {
 
 function ImageDragDrop ({images , setImages , DeleteImages}:ImageDragDropProps) {
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const newImages: FileUploadResult[] = acceptedFiles.map((file, index) => ({
-      supabaseID: ``,
-      name: file.name,
-      url: URL.createObjectURL(file),
-      size: file.size,
-      type: file.type,
-      lastModified: file.lastModified,
-    }));
+  const onDrop = useCallback( async (acceptedFiles: File[]) => {
+
+    const newImages = await Promise.all(
+      acceptedFiles.map((file) => toB64(file))
+    );
 
     setImages((prev) => [...prev, ...newImages]);
    
@@ -55,7 +43,7 @@ function ImageDragDrop ({images , setImages , DeleteImages}:ImageDragDropProps) 
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 bg-gradient-to-r from-gray-900/50 to-gray-800/50 rounded-xl backdrop-blur-sm border border-gray-700/50">
+    <div className="w-full max-w-[52rem] mx-auto p-4 bg-gradient-to-r from-gray-900/50 to-gray-800/50 rounded-xl backdrop-blur-sm border border-gray-700/50">
       <div
         {...getRootProps()}
         className={`border-2 border-dashed border-gray-500 rounded-md p-6 text-center transition-colors duration-200 ${
@@ -75,7 +63,7 @@ function ImageDragDrop ({images , setImages , DeleteImages}:ImageDragDropProps) 
           <div className="flex space-x-4 pb-4">
             {images.map((image , index) => (
               <div
-                key={image.supabaseID}
+                key={`image.supabaseID.${index}-${image.name}`}
                 className="relative flex-shrink-0 w-48 bg-gray-800/40 rounded-md p-3 border border-gray-600 hover:border-blue-400 transition-all duration-200 group"
               >
                 <img

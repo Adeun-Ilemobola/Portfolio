@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, boolean, integer, json } from "drizzle-orm/pg-core";
+import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 export const user = pgTable("user", {
 	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
@@ -77,8 +78,6 @@ export const projectdb = pgTable("project", {
 	githubLink: text('github_link'), // Link to the GitHub repository
 	liveLink: text('live_link'), // Link to the live project
 })
-
-
 export const schema = {
 	user,
 	session,
@@ -87,11 +86,7 @@ export const schema = {
 	imagedb,
 	projectdb
 };
-
-
 /// ----------------- Zod Schemas ----------------- ///
-
-import { z } from 'zod';
 
 // ── Image ──────────────────────────────────────────────────────────────────────
 export const imageSchema = z.object({
@@ -101,9 +96,7 @@ export const imageSchema = z.object({
 	size: z.number().int(),       // notNull integer
 	type: z.string(),             // notNull text (e.g. "image/png")
 	lastModified: z.date(),       // notNull timestamp
-	supabaseID: z.string(),       // notNull unique text
-	createdAt: z.date(),          // notNull timestamp
-	updatedAt: z.date(),          // notNull timestamp
+	supabaseID: z.string(),       // notNull unique text          // notNull timestamp
 	projectId: z.string().default(""),        // notNull text FK
 });
 export type Image = z.infer<typeof imageSchema>;
@@ -114,7 +107,6 @@ export const projectSchema = z.object({
 	id: z.string(),               // text UUID
 	title: z.string(),            // notNull text
 	description: z.string(),      // notNull text
-
 	createdAt: z.date(),          // notNull timestamp
 	updatedAt: z.date(),          // notNull timestamp
 	userId: z.string(),           // notNull text FK
@@ -132,11 +124,8 @@ export const defaultImage: Image = {
   type: '',
   lastModified: new Date(),
   supabaseID: '',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  projectId: '',    // your FK default
+  projectId: '',   
 }
-
 //–– a blank Project
 export const defaultProject: Project = {
   id: '',
@@ -151,3 +140,25 @@ export const defaultProject: Project = {
   githubLink: '',
   liveLink: '',
 }
+
+
+// fields the client *sends* when creating a project:
+export const projectCreateSchema = z.object({
+  title:       z.string(),
+  description: z.string(),
+  isPublic:    z.boolean().default(true),
+  technologies: z.array(z.string()).default([]),
+  githubLink:  z.string().url().optional(),
+  liveLink:    z.string().url().optional(),
+})
+
+// fields the client *sends* when creating an image:
+export const imageCreateSchema = z.object({
+  name:         z.string(),
+  url:          z.string().url(),
+  size:         z.number().int(),
+  type:         z.string(),
+  // if you’re sending lastModified as an ISO string, coerce it:
+  lastModified: z.coerce.date(),
+  supabaseID:   z.string(),
+})

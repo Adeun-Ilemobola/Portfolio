@@ -17,7 +17,6 @@ function sanitizeFilename(name: string): string {
 
 export function UploadImage(file: FileUploadResult, userID: string): Promise<FileUploadResult> {
     return new Promise(async (resolve, reject) => {
-
         if (!file) {
             reject(new Error('No file provided for upload'));
             return;
@@ -27,11 +26,11 @@ export function UploadImage(file: FileUploadResult, userID: string): Promise<Fil
             return;
         }
         const path = `${userID}/${Date.now()}-${sanitizeFilename(file.name)}`;
-        const { data: uploadData, error } = await supabase.storage.from("img").upload(path, base64ToBlob(file.url, file.type));
+        const { data: uploadData, error } = await supabase.storage.from("projectimages").upload(path, base64ToBlob(file.url, file.type));
         if (error) {
             throw new Error(`Upload failed: ${error.message}`);
         }
-        const publicUrl = supabase.storage.from("img").getPublicUrl(uploadData.path).data.publicUrl;
+        const publicUrl = supabase.storage.from("projectimages").getPublicUrl(uploadData.path).data.publicUrl;
         resolve({
             name: file.name,
             url: publicUrl,
@@ -39,14 +38,11 @@ export function UploadImage(file: FileUploadResult, userID: string): Promise<Fil
             type: file.type,
             lastModified: file.lastModified,
             supabaseID: uploadData.path
-
         });
-
     })
 
 
 }
-
 function chunkArray<T>(array: T[], size: number): T[][] {
     const result: T[][] = [];
     for (let i = 0; i < array.length; i += size) {
@@ -54,7 +50,6 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     }
     return result;
 }
-
 export function UploadImageList(files: FileUploadResult[], userID: string): Promise<FileUploadResult[]> {
     return new Promise(async (resolve, reject) => {
         const uploadedImages: FileUploadResult[] = [];
@@ -80,7 +75,7 @@ export function UploadImageList(files: FileUploadResult[], userID: string): Prom
 
 
 export async function DeleteImages(paths: string[]) {
-    const { error } = await supabase.storage.from("img").remove(paths);
+    const { error } = await supabase.storage.from("projectimages").remove(paths);
     if (error) {
         console.error("Failed to delete images:", error.message);
     }

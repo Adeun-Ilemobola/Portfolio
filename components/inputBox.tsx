@@ -171,6 +171,7 @@ export function TextAreaBox({
                 onChange={(e) => onChange?.(e.target.value)}
                 disabled={disabled}
                 placeholder={placeholder}
+                className='w-full flex-1 resize-none'
               
             />
         </div>

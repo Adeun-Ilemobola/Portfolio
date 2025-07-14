@@ -1,6 +1,7 @@
 import { pgTable, text, timestamp, boolean, integer, json } from "drizzle-orm/pg-core";
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
+import { is } from "drizzle-orm";
 export const user = pgTable("user", {
 	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	name: text('name').notNull(),
@@ -78,6 +79,14 @@ export const projectdb = pgTable("project", {
 	githubLink: text('github_link'), // Link to the GitHub repository
 	liveLink: text('live_link'), // Link to the live project
 })
+
+export const aboutdb = pgTable("about", {
+	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
+	content: text('content').notNull(),
+	isPublic: boolean('is_public').$defaultFn(() => true).notNull(),
+	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
+	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
+})
 export const schema = {
 	user,
 	session,
@@ -100,6 +109,32 @@ export const imageSchema = z.object({
 	projectId: z.string().default(""),        // notNull text FK
 });
 export type Image = z.infer<typeof imageSchema>;
+
+
+// ---------------- About ---------------
+export const aboutSchema = z.object({
+	id: z.string(),
+	content: z.string(),
+	isPublic: z.boolean(),
+	createdAt: z.date(),
+	updatedAt: z.date(),
+})
+export type About = z.infer<typeof aboutSchema>;
+
+export const aboutCreateSchema = z.object({
+	content: z.string(),
+	isPublic: z.boolean().default(true),	
+})
+
+export const  defaultAbout: About = {
+	id: '',
+	content: '',
+	isPublic: true,
+	createdAt: new Date(),
+	updatedAt: new Date(),
+}
+
+
 
 
 // ── Project ───────────────────────────────────────────────────────────────────

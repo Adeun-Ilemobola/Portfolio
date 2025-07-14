@@ -2,7 +2,7 @@
 import ProjectCard from '@/components/ProjectCard'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/trpc'
-import React from 'react'
+import React, { useState } from 'react'
 import { toast } from 'sonner'
 import {
     Dialog,
@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/dialog"
 import { FileUploadResult } from '@/lib/utils'
 import { DeleteImages, UploadImageList } from '@/lib/supabase'
-import { defaultImage, defaultProject, Image, imageSchema, Project, projectSchema } from '@/lib/auth-schema'
+import { About, defaultAbout, defaultImage, defaultProject, Image, imageSchema, Project, projectSchema } from '@/lib/auth-schema'
 import InputBox, { SelectBox, SelectorBox, TextAreaBox } from '@/components/inputBox'
 import { authClient } from '@/lib/auth-client'
 import ImageDragDrop from '@/components/img'
 import { set } from 'zod'
+import { PackagePlus } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 
 interface ProjectModeProps {
@@ -42,6 +44,7 @@ export default function Page() {
         show: false,
         mode: "create"
     })
+    const [showaboutRecord, setshowAboutRecord] = React.useState(false);
     const [projectInfo, setProjectInfo] = React.useState<Project | null>(null);
     const { data: getProjectsShowcase, ...getProjectsRest } = api.getProjectsShowcase.useQuery({
         limit: 10,
@@ -74,6 +77,17 @@ export default function Page() {
                 >
                     Add New Project
                 </Button>
+
+                <Button
+                    variant={"secondary"}
+                    onClick={() => {
+                        setProjectMode(pre => ({ ...pre, show: false, }));
+                        setshowAboutRecord(true);
+                    }}
+                >
+                    add/update about record
+                </Button>
+
 
                 <Button
                     variant="destructive"
@@ -137,12 +151,19 @@ export default function Page() {
                 />
             )}
 
+
+            <AboutRecord
+                setshowAboutRecord={setshowAboutRecord}
+                showaboutRecord={showaboutRecord}
+            />
+
+
         </div>
     )
 }
 
 
-function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: ProjectModProps) {
+function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh }: ProjectModProps) {
     // Logic for project creation or update modal
     const [images, setImages] = React.useState<FileUploadResult[]>([]);
     const [isUploading, setUploading] = React.useState(false);
@@ -151,7 +172,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
         onSuccess(data, variables) {
             if (data.success) {
                 toast.success(data.meg)
-                  setConfig({ ...config, show: false });
+                setConfig({ ...config, show: false });
                 reFresh();
             } else if (!data.success) {
                 toast.error(data.meg);
@@ -159,7 +180,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
                     DeleteImages(variables.images.map(op => (op.supabaseID)))
                 }
             }
-             setUploading(false);
+            setUploading(false);
         },
         onError(error, variables, context) {
             toast.error(error.message);
@@ -178,7 +199,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
         if (!Session || !Session.data?.user.id) {
             toast.error("User session not found. Please log in.");
             console.log("User session not found. Please log in.");
-            
+
             setUploading(false);
             return;
         }
@@ -194,7 +215,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
             }
             console.log("Project validated successfully:", vProject.data);
 
-            
+
             const imagesToUpload = images.filter(img => !img.supabaseID || img.supabaseID === "");
             uploadedImages = await UploadImageList(imagesToUpload, Session.data?.user.id);
             const uploadedImageToDB: Image[] = uploadedImages.map(img => ({
@@ -203,15 +224,15 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
                 projectId: "",
                 lastModified: new Date(img.lastModified)
             }))
-         
+
 
             if (config.mode === "create") {
                 console.log("send data to create project", project, uploadedImageToDB);
-                
+
                 const r = createProject.mutateAsync({
                     project: {
                         ...project,
-                      
+
                     },
                     images: [...uploadedImageToDB]
                 })
@@ -224,14 +245,14 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
             } else if (config.mode === "update") {
                 setProjectInfo(null); // Reset project info for update
             }
-             setUploading(false);
+            setUploading(false);
 
 
 
         } catch (error) {
             console.error(`Error during project ${config.mode}:`, error);
             toast.error(`Failed to ${config.mode} project`);
-            if (uploadedImages.length > 0){
+            if (uploadedImages.length > 0) {
                 await DeleteImages(uploadedImages.map(img => img.supabaseID));
             }
 
@@ -239,7 +260,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
         }
         setUploading(false);
 
-      
+
 
     }
     return (
@@ -262,21 +283,21 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
                                 placeholder="Enter project title"
                                 value={project.title}
                                 onChange={(e) => setProjectInfo({ ...project, title: e })}
-                                 disabled={DisableInputs}
+                                disabled={DisableInputs}
                             />
                             <InputBox
                                 label="github Link"
                                 placeholder="Enter GitHub link"
                                 value={project.githubLink || ''}
                                 onChange={(e) => setProjectInfo({ ...project, githubLink: e })}
-                                 disabled={DisableInputs}
+                                disabled={DisableInputs}
                             />
                             <InputBox
                                 label="Live Link"
                                 placeholder="Enter live project link"
                                 value={project.liveLink || ''}
                                 onChange={(e) => setProjectInfo({ ...project, liveLink: e })}
-                                 disabled={DisableInputs}
+                                disabled={DisableInputs}
                             />
                             <SelectBox
                                 label=" is Public"
@@ -306,14 +327,14 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
                                 { value: "Chakra UI", label: "Chakra UI" },
                             ]}
                             placeholder='Select technologies used in the project'
-                             disabled={DisableInputs}
+                            disabled={DisableInputs}
                         />
                         <TextAreaBox
                             label="Project Description"
                             value={project.description}
                             onChange={(e) => setProjectInfo({ ...project, description: e })}
                             placeholder="Enter project description"
-                             disabled={DisableInputs}
+                            disabled={DisableInputs}
                         />
                         <ImageDragDrop
                             images={images}
@@ -323,18 +344,18 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
                                 console.log("Deleting images:", paths);
                                 await DeleteImages(paths);
                             }}
-                            
+
 
                         />
 
                         <Button
                             className='w-full'
-                            onClick={ () => {
-                                 onSuccess();
+                            onClick={() => {
+                                onSuccess();
                             }}
                             disabled={DisableInputs}
                         >
-                            {config.mode === "create" ? ( DisableInputs ? "Creating Project..." : "Create Project"): ( DisableInputs ? "Updating Project..." : "Update Project")}
+                            {config.mode === "create" ? (DisableInputs ? "Creating Project..." : "Create Project") : (DisableInputs ? "Updating Project..." : "Update Project")}
                         </Button>
 
 
@@ -354,4 +375,149 @@ function ProjectMod({ config, setConfig, setProjectInfo, project , reFresh }: Pr
 }
 
 
+
+interface aboutRecordProps {
+    showaboutRecord: boolean
+    setshowAboutRecord: React.Dispatch<React.SetStateAction<boolean>>
+
+}
+
+function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) {
+    const [aboutRecordList, setaboutRecordList] = useState<About[]>([]);
+    const [aboutRecord, setaboutRecord] = useState<About | null>(null);
+    const [operationMode, setOperationMode] = useState<"create" | "update">("create");
+    const DisableInputs = (aboutRecord === null);
+
+
+
+
+    async function DeactivateRecord() {
+        const allRecordsToDeactivate = aboutRecordList.filter((record) => record.id !== aboutRecord?.id && record.isPublic).map((record) => record.id);
+        if (allRecordsToDeactivate.length > 0) {
+
+        }
+
+    }
+
+
+    function onSuccess() {
+        if (operationMode === "create") {
+            // Logic to create a new record
+            console.log("Creating record:", aboutRecord);
+        } else if (operationMode === "update") {
+            // Logic to update an existing record
+            console.log("Updating record:", aboutRecord);
+        }
+    }
+
+
+
+
+
+
+
+
+    return (
+        <Dialog open={showaboutRecord} onOpenChange={(open) => {
+            setshowAboutRecord(open);
+            setaboutRecord(null);
+        }}>
+            <DialogContent className='min-w-4xl'>
+                <DialogHeader>
+                    <DialogTitle>
+                        Add or Update About Record
+                    </DialogTitle>
+                    <DialogDescription className=' flex flex-col gap-2 p-3'>
+                        <div className='flex flex-col gap-1'>
+                            <h1 className='text-[1.1rem]'>Record history</h1>
+                            <div className='flex flex-row gap-2 p-1.5 flex-1 overflow-auto'>
+
+                                <Button
+                                    onClick={() => {
+                                        setaboutRecord(defaultAbout);
+                                        setOperationMode("create");
+                                    }}
+
+                                >
+                                    --<PackagePlus />--
+                                </Button>
+
+                                {aboutRecordList.map((record) => (
+
+                                    <Button
+                                        key={record.id}
+                                        onClick={() => {
+                                            setaboutRecord(record);
+                                            setOperationMode("update");
+                                        }}
+                                    >
+                                        {record.content}
+                                    </Button>
+
+                                ))}
+
+
+
+                            </div>
+                        </div>
+                        {aboutRecord ? (
+                            <>
+                                <TextAreaBox
+                                    label={
+                                        <div className='flex flex-row gap-2.5 items-center p-1.5'>
+                                            <p className='text-[1rem]'>Record Description</p>
+                                            <Badge variant={aboutRecord.isPublic ? "public" : "private"} size="sm">
+                                                {aboutRecord.isPublic ? "Public" : "Private"}
+                                            </Badge>
+                                        </div>
+                                    }
+                                    value={aboutRecord.content}
+                                    onChange={(e) => setaboutRecord({ ...aboutRecord, content: e, updatedAt: new Date() })}
+                                    placeholder="Enter record description"
+                                    disabled={DisableInputs}
+                                    className='flex-1 min-h-[20rem]'
+                                />
+
+                                <Button
+                                    className='w-full'
+                                    onClick={() => {
+                                        onSuccess();
+                                    }}
+                                    disabled={DisableInputs}
+                                >
+                                    {operationMode === "create" ? (DisableInputs ? "Creating Record..." : "Create Record") : (DisableInputs ? "Updating Record..." : "Update Record")}
+                                </Button>
+
+                            </>
+
+                        ) : (
+                            <>
+                                <div className='flex flex-col gap-2 p-1.5 justify-center items-center flex-1'>
+                                    <h1>No Record Selected or Created</h1>
+                                    <Button
+                                        onClick={() => {
+                                            setaboutRecord(defaultAbout);
+                                            setOperationMode("create");
+                                        }}
+                                    >
+                                        --<PackagePlus />--
+                                    </Button>
+                                </div>
+
+                            </>
+
+                        )
+
+                        }
+
+                    </DialogDescription>
+                </DialogHeader>
+            </DialogContent>
+
+
+
+        </Dialog>
+    )
+
+}
 

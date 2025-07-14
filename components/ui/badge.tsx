@@ -17,10 +17,14 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        public: "bg-emerald-100 text-emerald-600",
+        private: "bg-rose-100     text-rose-600",
       },
+       size: { sm: "text-xs", md: "text-sm" },
     },
     defaultVariants: {
       variant: "default",
+      size:    "md",
     },
   }
 )

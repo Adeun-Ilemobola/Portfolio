@@ -56,13 +56,16 @@ function Login({ setLoading , push }: { setLoading: React.Dispatch<React.SetStat
                     email: data.email,
                     password: data.password,
                   
+                }).then(() => {
+                    toast.success('Login successful');
+                    
                 })
                 // wrap it in toast.promise
                 toast.promise(s, {
                     loading: 'Logging in…',
-                    success: 'Welcome back!',
                     error: (err) => `Login failed: ${err.message}`,
                 })
+
                 push('/admin/dashboard'); // Redirect to dashboard after successful login
                 return
 
@@ -79,6 +82,7 @@ function Login({ setLoading , push }: { setLoading: React.Dispatch<React.SetStat
 
         onError: (error) => {
             console.error('Login failed:', error);
+            toast.error(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     })
     const handleLogin = async () => {
@@ -143,25 +147,31 @@ function Register({ setMode }: { setMode: React.Dispatch<React.SetStateAction<"l
     });
     const mRegister = useMutation({
         mutationFn: async (data: { email: string; password: string; confirmPassword: string }) => {
-            // Replace with your registration API call
-            await authClient.signUp.email({
+           try {
+            const s = authClient.signUp.email({
                 email: data.email,
                 password: data.password,
-                name: data.email.split('@')[0], // Example: use email prefix as name
+                name: data.email.slice(0, data.email.indexOf("@")),
+            }).then(() => {
+                toast.success('Registration successful');
+                setMode('login');
+            })
+            toast.promise(s, {
+                loading: 'Registering…',
+                error: (err) => `Registration failed: ${err.message}`,
+            })
+            
+           } catch (error) {
+            console.log("error" , error);
+            toast.error(`Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            
+            
+           }
 
-            },
-                {
-                    onSuccess(context) {
-                        console.log('Registration successful:', context);
-                        setMode('login'); // Switch to login mode after successful registration
-                    },
-                }
-            )
-
-            return new Promise((resolve) => setTimeout(resolve, 1000));
         },
         onSuccess: () => {
             console.log('Registration successful');
+
         },
         onError: (error) => {
             console.error('Registration failed:', error);
@@ -179,7 +189,6 @@ function Register({ setMode }: { setMode: React.Dispatch<React.SetStateAction<"l
         // wrap it in toast.promise
         toast.promise(p, {
             loading: 'Registering…',
-            success: 'Registration successful!',
             error: (err) => `Registration failed: ${err.message}`,
         })
         setRegisterData({

@@ -65,7 +65,7 @@ export default function ImageDropzone({
       lastModified: file.lastModified,
     }));
     updateFiles([...files, ...mapped]);
-  }, [files]);
+  }, [files , updateFiles]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "image/*": [] },

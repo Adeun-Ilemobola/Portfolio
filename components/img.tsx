@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { X } from 'lucide-react';
 import { FileUploadResult, toB64 } from '@/lib/utils';
+import Image from 'next/image';
 
 interface ImageDragDropProps {
   images: FileUploadResult[];
@@ -66,7 +67,7 @@ function ImageDragDrop ({images , setImages , DeleteImages}:ImageDragDropProps) 
                 key={`image.supabaseID.${index}-${image.name}`}
                 className="relative flex-shrink-0 w-48 bg-gray-800/40 rounded-md p-3 border border-gray-600 hover:border-blue-400 transition-all duration-200 group"
               >
-                <img
+                <Image
                   src={image.url}
                   alt={image.name}
                   className="w-full h-32 object-cover rounded-sm"

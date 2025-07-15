@@ -41,10 +41,11 @@ export default function Home() {
             <span className="text-3xl text-amber-600">A </span>
             developer with a focused interest in web and software development and a forward-looking mindset about where technology is headed.
             I take pride in building clean, maintainable solutions — whether that means crafting responsive interfaces or implementing reliable backend systems.
-            My approach combines technical precision with a strong sense of purpose, and I'm always eager to contribute to projects that prioritize innovation,
-            usability, and long-term impact. I'm looking to connect with teams and organizations that value clear communication,
+            My approach combines technical precision with a strong sense of purpose, and I&apos;m always eager to contribute to projects that prioritize innovation,
+            usability, and long-term impact. I&apos;m looking to connect with teams and organizations that value clear communication,
             thoughtful execution, and the drive to build meaningful digital experiences.
           </p>
+
 
           <div className="mt-6 flex flex-row gap-4 justify-center items-center">
             <Button
@@ -73,10 +74,6 @@ export default function Home() {
           </div>
 
         </div>
-
-
-
-
       </div>
 
       <div className="w-full h-[95vh] border p-6 flex flex-col gap-1.5 ">
@@ -100,12 +97,7 @@ export default function Home() {
           />
 
         </div>
-
-
-
       </div>
-
-
       <div className="w-full h-[95vh] border flex flex-col gap-4 p-4">
         {/* the project section */}
 
@@ -119,7 +111,7 @@ export default function Home() {
                   key={project.id}
                   id={project.id}
                   title={project.title}
-                  onDelete={() => {}}
+                  onDelete={() => { }}
                   tools={project.tools} // Assuming tools are not provided in the showcase
                   devMode={false} // Assuming devMode is not applicable in the showcase
                 />
@@ -130,12 +122,7 @@ export default function Home() {
           }
 
         </div>
-
-
       </div>
-
-
-
     </div>
   );
 }

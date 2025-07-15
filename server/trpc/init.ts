@@ -3,7 +3,9 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { headers } from 'next/headers';
 
 // Creates context for each request (attaches user session, etc)
-export const createTRPCContext = async (opts: { req: Request }) => {
+export const createTRPCContext = async () => {
+  // console.log("------- createTRPCContext -------" , opts);
+  
       const session = await auth.api.getSession({
         headers: await headers(),
       });

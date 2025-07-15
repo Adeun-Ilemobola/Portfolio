@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
-const Rount = {
-    auth: ["/admin"],
-    main: ["/admin/dashboard"],
-};
 
 export async function middleware(request: NextRequest) {
    const { pathname } = request.nextUrl;

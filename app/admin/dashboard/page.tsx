@@ -2,7 +2,7 @@
 import ProjectCard from '@/components/ProjectCard'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/trpc'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
     Dialog,
@@ -10,17 +10,18 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
+    
 } from "@/components/ui/dialog"
 import { FileUploadResult } from '@/lib/utils'
 import { DeleteImages, UploadImageList } from '@/lib/supabase'
-import { About, defaultAbout, defaultImage, defaultProject, Image, imageSchema, Project, projectSchema } from '@/lib/auth-schema'
+import { About, aboutCreateSchema, aboutSchema, defaultAbout, defaultProject, Image, Project, projectSchema } from '@/lib/auth-schema'
 import InputBox, { SelectBox, SelectorBox, TextAreaBox } from '@/components/inputBox'
 import { authClient } from '@/lib/auth-client'
 import ImageDragDrop from '@/components/img'
-import { set } from 'zod'
-import { PackagePlus } from 'lucide-react'
+import { LoaderCircle, PackagePlus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+
+import SpaceLoadingScreen from '@/components/LoadingScreen'
 
 
 interface ProjectModeProps {
@@ -104,11 +105,11 @@ export default function Page() {
             </div>
 
 
-            <div className='flex flex-col flex-1  gap-2.5 '>
+            <div className='flex flex-col flex-1 h-full  gap-2.5 '>
                 <h1 className='text-3xl font-bold'>Admin Dashboard</h1>
                 <p className='text-muted-foreground'>Manage your projects and settings here.</p>
 
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                <div className='flex flex-row flex-wrap gap-4 flex-1'>
                     {
                         getProjectsShowcase && getProjectsShowcase.data ? (
                             getProjectsShowcase.data.map((project) => (
@@ -122,7 +123,7 @@ export default function Page() {
                                 />
                             ))
                         ) : (
-                            <p className='text-muted-foreground text-2xl'>No projects available.</p>
+                            <SpaceLoadingScreen fullScreen={false} />
                         )
                     }
 
@@ -182,7 +183,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh }: Pro
             }
             setUploading(false);
         },
-        onError(error, variables, context) {
+        onError(error, variables) {
             toast.error(error.message);
             if (variables.images.length > 0) {
                 DeleteImages(variables.images.map(op => (op.supabaseID)))
@@ -386,7 +387,44 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
     const [aboutRecordList, setaboutRecordList] = useState<About[]>([]);
     const [aboutRecord, setaboutRecord] = useState<About | null>(null);
     const [operationMode, setOperationMode] = useState<"create" | "update">("create");
-    const DisableInputs = (aboutRecord === null);
+    const getAllAboutRecords = api.getAllAboutRecord.useQuery({
+        offset: 0,
+        limit: 12,
+    })
+
+
+    const UpdateMut = api.updateAboutRecord.useMutation({
+        onSuccess: () => {
+            getAllAboutRecords.refetch();
+        }
+    });
+    const CreateMut = api.createAboutRecord.useMutation({
+        onSuccess: () => {
+            getAllAboutRecords.refetch();
+        }
+    });
+    const DeactivateMut = api.DeactivateAboutRecord.useMutation({
+        onSuccess: () => {
+            getAllAboutRecords.refetch();
+        }
+    });
+
+    const DisableInputs = (aboutRecord === null) || UpdateMut.isPending || CreateMut.isPending || DeactivateMut.isPending;
+    useEffect(() => {
+
+        if (getAllAboutRecords.data?.record) {
+            const records = getAllAboutRecords.data.record.map((record) => {
+                return {
+                    id: record.id,
+                    content: record.content,
+                    isPublic: record.isPublic,
+                    createdAt: new Date(record.createdAt),
+                    updatedAt: new Date(record.updatedAt),
+                }
+            })
+            setaboutRecordList(records);
+        }
+    }, [getAllAboutRecords.data])
 
 
 
@@ -394,29 +432,69 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
     async function DeactivateRecord() {
         const allRecordsToDeactivate = aboutRecordList.filter((record) => record.id !== aboutRecord?.id && record.isPublic).map((record) => record.id);
         if (allRecordsToDeactivate.length > 0) {
+            await DeactivateMut.mutateAsync({ id: allRecordsToDeactivate });
 
         }
 
     }
 
 
-    function onSuccess() {
+    async function onSuccess() {
         if (operationMode === "create") {
+            console.log(" create aboutRecord", aboutRecord);
+
+            const vAboutRecord = await aboutCreateSchema.safeParseAsync({
+                content: aboutRecord?.content || '',
+                isPublic: aboutRecord?.isPublic || false
+            });
+            if (!vAboutRecord.success) {
+                if (vAboutRecord.error.errors) {
+                    vAboutRecord.error.errors.forEach((error) => {
+                        toast.error(error.message);
+                    });
+
+                }
+                return
+            }
+            await DeactivateRecord();
+            const aboutSend = CreateMut.mutateAsync({ aboutRecord: vAboutRecord.data })
+            toast.promise(aboutSend, {
+                loading: 'Creating record…',
+                success: 'Record created!',
+                error: (err) => `Record creation failed: ${err.message}`,
+            })
             // Logic to create a new record
             console.log("Creating record:", aboutRecord);
         } else if (operationMode === "update") {
+
             // Logic to update an existing record
-            console.log("Updating record:", aboutRecord);
+            if (!aboutRecord) {
+                toast.error("Please select a record to update");
+                return
+            }
+            const vAboutRecord = await aboutSchema.safeParseAsync(aboutRecord)
+            if (!vAboutRecord.success) {
+                if (vAboutRecord.error.errors) {
+                    vAboutRecord.error.errors.forEach((error) => {
+                        toast.error(error.message);
+                    });
+                    console.error(vAboutRecord.error.errors);
+                }
+                return
+            }
+            await DeactivateRecord();
+            const aboutSend = UpdateMut.mutateAsync({
+                    id: vAboutRecord.data.id,
+                    content: vAboutRecord.data.content,
+                    isPublic: vAboutRecord.data.isPublic,
+            })
+            toast.promise(aboutSend, {
+                loading: 'Updating record…',
+                success: 'Record updated!',
+                error: (err) => `Record update failed: ${err.message}`,
+            })
         }
     }
-
-
-
-
-
-
-
-
     return (
         <Dialog open={showaboutRecord} onOpenChange={(open) => {
             setshowAboutRecord(open);
@@ -427,10 +505,15 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
                     <DialogTitle>
                         Add or Update About Record
                     </DialogTitle>
-                    <DialogDescription className=' flex flex-col gap-2 p-3'>
-                        <div className='flex flex-col gap-1'>
+                    <DialogDescription >
+                        <p className='text-[1.1rem]'>Please select a record to update or create a new one</p>
+
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className='flex flex-col gap-1'>
                             <h1 className='text-[1.1rem]'>Record history</h1>
-                            <div className='flex flex-row gap-2 p-1.5 flex-1 overflow-auto'>
+                            <div className='flex flex-row gap-2 p-1.5 flex-1 items-center overflow-auto'>
 
                                 <Button
                                     onClick={() => {
@@ -442,19 +525,43 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
                                     --<PackagePlus />--
                                 </Button>
 
-                                {aboutRecordList.map((record) => (
+                                {getAllAboutRecords.isPending ?
+                                    (
 
-                                    <Button
-                                        key={record.id}
-                                        onClick={() => {
-                                            setaboutRecord(record);
-                                            setOperationMode("update");
-                                        }}
-                                    >
-                                        {record.content}
-                                    </Button>
+                                        <>
+                                            <div className=' flex-1  w-full'>
+                                                <span className='flex flex-row gap-2 items-center'>
+                                                    <LoaderCircle className='animate-spin' />
+                                                    <span className='text-[1rem]'>Loading...</span>
+                                                </span>
+                                            </div>
+                                        </>
 
-                                ))}
+                                    )
+                                    : (
+                                        <>
+                                            {aboutRecordList.map((record) => (
+
+                                                <Button
+                                                    key={record.id}
+                                                    variant={record.isPublic ? "default" : "secondary"}
+                                                    className={
+                                                        aboutRecord?.id === record.id ? "text-fuchsia-800" : ""
+                                                    }
+                                                    onClick={() => {
+                                                        setaboutRecord(record);
+                                                        setOperationMode("update");
+                                                    }}
+                                                >
+                                                    {record.createdAt.toLocaleString()}
+                                                </Button>
+
+                                            ))}
+                                        </>
+                                    )
+                                }
+
+
 
 
 
@@ -472,7 +579,7 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
                                         </div>
                                     }
                                     value={aboutRecord.content}
-                                    onChange={(e) => setaboutRecord({ ...aboutRecord, content: e, updatedAt: new Date() })}
+                                    onChange={(e) => setaboutRecord({ ...aboutRecord, isPublic: true, content: e, updatedAt: new Date() })}
                                     placeholder="Enter record description"
                                     disabled={DisableInputs}
                                     className='flex-1 min-h-[20rem]'
@@ -510,8 +617,6 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
 
                         }
 
-                    </DialogDescription>
-                </DialogHeader>
             </DialogContent>
 
 

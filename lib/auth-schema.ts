@@ -1,7 +1,6 @@
 import { pgTable, text, timestamp, boolean, integer, json } from "drizzle-orm/pg-core";
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { is } from "drizzle-orm";
 export const user = pgTable("user", {
 	id: text('id').primaryKey().$defaultFn(() => uuidv4()), // Use UUID for unique project IDs
 	name: text('name').notNull(),

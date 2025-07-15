@@ -1,11 +1,8 @@
-import { array, z } from 'zod';
+import { z } from 'zod';
 import { createTRPCRouter, baseProcedure, protectedProcedure } from '../init';
-import { create } from 'domain';
-import { projectdb, projectSchema, imageSchema, imagedb, projectCreateSchema, imageCreateSchema  } from '@/lib/auth-schema';
-import { clean } from 'better-auth/react';
+import { projectdb, imagedb, projectCreateSchema, imageCreateSchema, aboutCreateSchema, aboutdb  } from '@/lib/auth-schema';
 import db from '@/lib/database';
 import { eq } from 'drizzle-orm'
-import { get } from 'http';
 
 // Root API router, aggregate your subrouters here
 export const appRouter = createTRPCRouter({
@@ -104,6 +101,114 @@ export const appRouter = createTRPCRouter({
                     return { success: false, error: "Failed to fetch project" };
                 }
             }),
+
+
+
+            createAboutRecord:
+            protectedProcedure
+                .input(
+                    z.object({
+                        aboutRecord: aboutCreateSchema, // Use the Zod schema for input validation
+                    })
+                )
+                .mutation(async ({ input }) => {
+                    try {
+                        // Logic to create a new project in the database
+                        // This is where you would interact with your database to save the project
+                        const { aboutRecord } = input;
+
+                        console.log("Finish the cleanup for my project and the images", aboutRecord);
+                        
+
+                        const [newRecord] = await db.insert(aboutdb).values({...aboutRecord }).returning();
+                        if (!newRecord) {
+                           return { success: false, meg: "Failed to create project" };
+                        }
+                        console.log("New project created:", newRecord);
+                        return { success: true, meg: "Successfully created project" }; // Replace with actual project ID
+                    } catch (error) {
+                        console.error("Error creating project:", error);
+                        return { success: false, meg: "Failed to create project" };
+
+                    }
+
+                }),
+
+
+                getAllAboutRecord:
+                baseProcedure
+                    .input(z.object({
+                        limit: z.number().optional().default(10), // Optional limit for the number of projects to fetch
+                        offset: z.number().optional().default(0) // Optional offset for pagination
+                    }))
+                    .query(async ({ input }) => {
+                        try {
+                            // Logic to fetch projects for showcase
+                            const { limit, offset } = input;
+                            const records = await db.select().from(aboutdb).limit(limit).offset(offset);
+                            if (!records || records.length === 0) {
+                                return { success: false, record: null};
+                            }
+                            return { success: true, record: records };
+                        } catch (error) {
+                            console.error("Error fetching about Record:", error);
+                            return { success: false, record: null };
+                        }
+                    }),
+
+                    updateAboutRecord:
+                    protectedProcedure
+                        .input(aboutCreateSchema.extend({ id: z.string() }))
+                        .mutation(async ({ input }) => {
+                            try {
+                                console.log(" my about Record  aand start the update process", input);
+                                const [newRecord] = await 
+                                db.update(aboutdb).set({
+                                    content: input.content,
+                                    isPublic: input.isPublic,
+                                    updatedAt: new Date()
+                                }).where(
+                                    eq(aboutdb.id , input.id)
+                                ).returning();
+                                if (!newRecord) {
+                                   return { success: false, message: "Failed to create about Record" };
+                                }
+                                console.log("New about Record created:", newRecord);
+                                return { success: true, message: "Successfully created about Record" }; // Replace with actual project ID
+                            } catch (error) {
+                                console.error("Error creating project:", error);
+                                return { success: false, message: "Failed to create about Record" };
+
+                            }
+                        }),
+
+
+
+                        DeactivateAboutRecord:
+                        baseProcedure
+                            .input(z.object({
+                                id: z.array(z.string()) 
+                            }))
+                            .mutation(async ({ input }) => {
+                                try {
+                                    const { id } = input;
+                                    await Promise.all(id.map(async (id) => {
+                                        const record = await db.update(aboutdb).set({
+                                            isPublic: false
+                                        }).where(
+                                            eq(aboutdb.id , id)
+                                        ).returning();
+                                        
+                                      return record
+                                    }))
+                                    return { success: true, value: "Successfully deactivated  about Record" };
+                                   
+                                   
+                                } catch (error) {
+                                    console.error("Error fetching  about Record by ID:", error);
+                                    return { success: false, value: "Failed to fetch about Record" };
+                                }
+                            }),
 
 
 

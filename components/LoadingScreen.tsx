@@ -40,7 +40,7 @@ const SpaceLoadingScreen = ({
         : "w-full h-full flex-1 bg-fuchsia-900/5 backdrop-blur-sm";
 
     return (
-        <div className={`${containerClasses} flex flex-col items-center justify-center relative overflow-hidden ${className}`}>
+        <div className={`${containerClasses} flex flex-col items-center justify-center relative p-1.5 overflow-hidden ${className}`}>
             {/* Rocket Animation Container */}
             <div className="relative mb-8">
                 {/* Rocket Orbit Path */}

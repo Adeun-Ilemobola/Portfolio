@@ -1,18 +1,21 @@
 "use client";
 
-import InputBox from "@/components/inputBox";
-import InputBtu from "@/components/InputBtu";
-import { useState } from "react";
-import { ScanSearch } from 'lucide-react';
+
 import Nav from "@/components/Nav";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import Corner from "@/components/Corner";
 import BrickWall from "@/components/BrickWall";
 import ProjectCard from "@/components/ProjectCard";
+import { api } from "@/lib/trpc";
+import SpaceLoadingScreen from "@/components/LoadingScreen";
 
 
 export default function Home() {
+  const { data: getProjectsShowcase } = api.getProjectsShowcase.useQuery({
+    limit: 10,
+    offset: 0,
+  }
+  )
 
   return (
     <div className="flex flex-col m-auto max-w-[85rem] min-w-[85rem]    min-h-screen relative">
@@ -108,42 +111,23 @@ export default function Home() {
 
         <h1 className="text-4xl font-bold text-center mt-6">Projects</h1>
         <div className=" flex flex-row flex-wrap justify-center gap-5 ">
-          <ProjectCard
-            id="1"
-            title="Portfolio Website"
-           
-            tools={["HTML", "CSS", "JavaScript", "React"]}
-            devMode={true}
-          />
-          <ProjectCard
-            id="2"
-            title="E-commerce Platform"
-            
-            tools={["Next.js", "Node.js", "MongoDB"]}
-            devMode={true}
-          />
-          <ProjectCard
-            id="3"
-            title="Chat Application"
-         
-            tools={["React", "Node.js", "WebSockets"]}
-            devMode={true}
-          />
-          <ProjectCard
-            id="4"
-            title="Blog Platform"
-          
-            tools={["Django", "PostgreSQL", "Bootstrap"]}
-            devMode={true}
-          />
-          <ProjectCard
-            id="5"
-            title="Weather App"
-          
-            tools={["React", "Axios", "OpenWeatherMap API"]}
-            devMode={true}    
-            />
-            
+
+          {
+            getProjectsShowcase && getProjectsShowcase.data ? (
+              getProjectsShowcase.data.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  id={project.id}
+                  title={project.title}
+                  onDelete={() => {}}
+                  tools={project.tools} // Assuming tools are not provided in the showcase
+                  devMode={false} // Assuming devMode is not applicable in the showcase
+                />
+              ))
+            ) : (
+              <SpaceLoadingScreen fullScreen={false} />
+            )
+          }
 
         </div>
 

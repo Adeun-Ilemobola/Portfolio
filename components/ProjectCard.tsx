@@ -35,6 +35,8 @@ export default function ProjectCard({
         md:max-w-md        
         min-w-[8rem]     
         shrink-0
+        h-full
+        
       "
     >
       <ProjectCardLinkMode
@@ -81,7 +83,7 @@ export default function ProjectCard({
 
         {devMode && (
           <div className="pt-4 border-t border-gray-700/30 flex gap-2">
-            <Button variant="destructive" className="flex-1">
+            <Button variant="destructive" className="flex-1" onClick={onDelete}>
               Delete
             </Button>
             <Link href={`/project/${id}/update`} passHref>

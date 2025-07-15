@@ -56,10 +56,10 @@ function Login({ setLoading , push }: { setLoading: React.Dispatch<React.SetStat
                     email: data.email,
                     password: data.password,
                   
-                }).then(() => {
-                    toast.success('Login successful');
-                    
-                })
+                }).catch((error) => {
+                    console.error('Login failed:', error);
+                    toast.error(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                });
                 // wrap it in toast.promise
                 toast.promise(s, {
                     loading: 'Logging in…',
@@ -155,6 +155,9 @@ function Register({ setMode }: { setMode: React.Dispatch<React.SetStateAction<"l
             }).then(() => {
                 toast.success('Registration successful');
                 setMode('login');
+            }).catch((error) => {
+                console.error('Registration failed:', error);
+                toast.error(`Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
             })
             toast.promise(s, {
                 loading: 'Registering…',

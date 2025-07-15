@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { X } from 'lucide-react';
 import { FileUploadResult, toB64 } from '@/lib/utils';
@@ -23,7 +23,7 @@ function ImageDragDrop ({images , setImages , DeleteImages}:ImageDragDropProps) 
     setImages((prev) => [...prev, ...newImages]);
    
     
-  }, []);
+  }, [setImages]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -34,11 +34,11 @@ function ImageDragDrop ({images , setImages , DeleteImages}:ImageDragDropProps) 
   const handleDelete = (ID: number) => {
     // Optionally, add Supabase delete logic here
     if (DeleteImages) {
-      const pathsToDelete = images.filter((img , i) => i !== ID)
+      const pathsToDelete = images.filter((_img , i) => i !== ID)
       .map(img => img.supabaseID);
       DeleteImages(pathsToDelete)
     }
-     setImages((prev) => prev.filter((img , i) => i !== ID));
+     setImages((prev) => prev.filter((_img , i) => i !== ID));
      
   };
 

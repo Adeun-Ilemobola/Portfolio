@@ -51,7 +51,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     return result;
 }
 export function UploadImageList(files: FileUploadResult[], userID: string): Promise<FileUploadResult[]> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
         const uploadedImages: FileUploadResult[] = [];
 
         for (const chunk of chunkArray(files, 3)) {

@@ -23,7 +23,7 @@ const zRegister = z.object({
 export default function Page() {
     const navigate = useRouter();
     const [mode, setMode] = React.useState<'login' | 'register'>('login')
-    const [loading, setLoading] = React.useState(false)
+    const [, setLoading] = React.useState(false)
     function Go(path:string) {
         navigate.push(path);   
     }

@@ -25,7 +25,7 @@ const SpaceLoadingScreen = ({
         const interval = setInterval(() => {
             setIsVisible(false);
             setTimeout(() => {
-                setCurrentTextIndex((prevIndex) =>
+                setCurrentTextIndex(() =>
                     Math.floor(Math.random() * loadingTexts.length)
                 );
                 setIsVisible(true);

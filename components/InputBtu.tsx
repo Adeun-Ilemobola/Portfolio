@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import InputBox, { InputBoxProps } from './inputBox'
+import InputBox from './inputBox'
 import clsx from 'clsx';
 import { Button } from './ui/button';
 import { ScanSearch } from 'lucide-react';

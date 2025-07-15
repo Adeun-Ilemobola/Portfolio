@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import clsx from "clsx";
+import Image from "next/image";
 
 /**
  * Represents a file uploaded through the component.
@@ -109,7 +110,7 @@ export default function ImageDropzone({
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
-                <img
+                <Image
                   src={file.url}
                   alt={file.name}
                   className="h-32 w-full rounded-t-xl object-cover"

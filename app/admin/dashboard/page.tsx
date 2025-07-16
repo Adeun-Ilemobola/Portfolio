@@ -22,6 +22,8 @@ import { LoaderCircle, PackagePlus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 import SpaceLoadingScreen from '@/components/LoadingScreen'
+import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 
 
 interface ProjectModeProps {
@@ -38,12 +40,29 @@ interface ProjectModProps {
     setProjectInfo: React.Dispatch<React.SetStateAction<Project | null>>;
     reFresh: () => void
 }
-
-
 export default function Page() {
+    const navigate = useRouter();
     const [ProjectMode, setProjectMode] = React.useState<ProjectModeProps>({
         show: false,
         mode: "create"
+    })
+    const LogOut = useMutation({
+        mutationFn: async () => {
+            try {
+                await authClient.signOut({
+                    fetchOptions:{
+                        onSuccess(context) {
+                            console.log('Logout successful' , context);
+                            toast.success('Logout successful');
+                            navigate.push('/');
+                        },
+                    }
+                })
+            } catch (error) {
+                console.error('Logout failed:', error);
+                throw error; // Re-throw to let useMutation handle it
+            }
+        }
     })
     const [showaboutRecord, setshowAboutRecord] = React.useState(false);
     const [projectInfo, setProjectInfo] = React.useState<Project | null>(null);
@@ -52,11 +71,6 @@ export default function Page() {
         offset: 0,
     }
     )
-
-
-
-
-
     function onDeleteProject(id: string) {
         // Logic to delete a project
         console.log(`Project with ID ${id} deleted`);
@@ -88,22 +102,17 @@ export default function Page() {
                 >
                     add/update about record
                 </Button>
-
-
                 <Button
                     variant="destructive"
                     onClick={() => {
                         // Logic to handle logout
-                        authClient.signOut();
-                        toast.success("Logged out successfully");
-                        console.log("Logout clicked");
-                        window.location.href = "/"; // Redirect to home page after logout
+                        LogOut.mutate();
+                      
                     }}
                 >
                     Logout
                 </Button>
             </div>
-
 
             <div className='flex flex-col flex-1 h-full  gap-2.5 '>
                 <h1 className='text-3xl font-bold'>Admin Dashboard</h1>
@@ -162,7 +171,6 @@ export default function Page() {
         </div>
     )
 }
-
 
 function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh }: ProjectModProps) {
     // Logic for project creation or update modal
@@ -433,12 +441,8 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
         const allRecordsToDeactivate = aboutRecordList.filter((record) => record.id !== aboutRecord?.id && record.isPublic).map((record) => record.id);
         if (allRecordsToDeactivate.length > 0) {
             await DeactivateMut.mutateAsync({ id: allRecordsToDeactivate });
-
         }
-
     }
-
-
     async function onSuccess() {
         if (operationMode === "create") {
             console.log(" create aboutRecord", aboutRecord);

@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { useMutation } from '@tanstack/react-query'
 import { LoaderCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation' 
 import React from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -21,12 +20,9 @@ const zRegister = z.object({
 }
 )
 export default function Page() {
-    const navigate = useRouter();
     const [mode, setMode] = React.useState<'login' | 'register'>('login')
     const [, setLoading] = React.useState(false)
-    function Go(path:string) {
-        navigate.push(path);   
-    }
+   
     return (
         <div className='flex flex-col m-auto max-w-[85rem] min-w-[85rem] justify-center items-center min-h-screen relative'>
             <div className='flex flex-col items-center justify-center w-2xl '>
@@ -34,7 +30,7 @@ export default function Page() {
                     {mode === 'login' ? 'Register' : 'Login'}
                 </Button>
 
-                {mode === 'login' ? <Login setLoading={setLoading} push={Go} /> : <Register setMode={setMode} />}
+                {mode === 'login' ? <Login setLoading={setLoading} /> : <Register setMode={setMode} />}
             </div>
 
         </div>
@@ -42,47 +38,40 @@ export default function Page() {
 }
 
 
-function Login({ setLoading , push }: { setLoading: React.Dispatch<React.SetStateAction<boolean>> , push: (path: string) => void }) {
-    
+function Login({ setLoading }: { setLoading: React.Dispatch<React.SetStateAction<boolean>> }) {
+
     const [loginData, setLoginData] = React.useState({
         email: '',
         password: ''
     });
     const mLogin = useMutation({
         mutationFn: async (data: { email: string; password: string }) => {
-            // Replace with your login API call
+            toast.loading('Logging in...' , { id: 'login' }); 
             try {
-                const s = authClient.signIn.email({
+                const signInPromise = await authClient.signIn.email({
                     email: data.email,
                     password: data.password,
-                  
-                }).catch((error) => {
-                    console.error('Login failed:', error);
-                    toast.error(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                    callbackURL: '/admin/dashboard',
                 });
-                // wrap it in toast.promise
-                toast.promise(s, {
-                    loading: 'Logging in…',
-                    error: (err) => `Login failed: ${err.message}`,
-                })
+                if (signInPromise.error) {
+                    console.error('Login failed:', signInPromise.error);
+                    throw signInPromise.error; // Re-throw to let useMutation handle it
+                }
 
-                push('/admin/dashboard'); // Redirect to dashboard after successful login
-                return
-
-
-
-
-
+                toast.success('Login successful', { id: 'login' });
+                return signInPromise;
             } catch (error) {
-                console.error('Login failed:', error);
-                toast.error(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
 
+                console.error('Login failed:', error);
+                 toast.error(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                throw error; // Re-throw to let useMutation handle it
             }
         },
 
         onError: (error) => {
             console.error('Login failed:', error);
             toast.error(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
         }
     })
     const handleLogin = async () => {
@@ -90,7 +79,11 @@ function Login({ setLoading , push }: { setLoading: React.Dispatch<React.SetStat
         setLoading(true);
         const loginValidation = zLogin.safeParse(loginData);
         if (!loginValidation.success) {
-            toast.error(`Login failed: ${loginValidation.error.message}`);
+           if (loginValidation.error.issues.length > 0) {
+               loginValidation.error.issues.forEach((error) => {
+                   toast.error(error.message);
+               })
+            }
             return;
         }
         await mLogin.mutateAsync({ ...loginData })
@@ -147,29 +140,27 @@ function Register({ setMode }: { setMode: React.Dispatch<React.SetStateAction<"l
     });
     const mRegister = useMutation({
         mutationFn: async (data: { email: string; password: string; confirmPassword: string }) => {
-           try {
-            const s = authClient.signUp.email({
-                email: data.email,
-                password: data.password,
-                name: data.email.slice(0, data.email.indexOf("@")),
-            }).then(() => {
-                toast.success('Registration successful');
+            toast.loading('Registering...', { id: 'register' });
+            try {
+                const s = await authClient.signUp.email({
+                    email: data.email,
+                    password: data.password,
+                    name: data.email.slice(0, data.email.indexOf("@")),
+                })
+                if (s.error) {
+                    console.error('Registration failed:', s.error);
+                    throw s.error; // Re-throw to let useMutation handle it
+                }
+                toast.success('Registration successful', { id: 'register' });
                 setMode('login');
-            }).catch((error) => {
-                console.error('Registration failed:', error);
+                return s;
+
+            } catch (error) {
+                console.log("error", error);
                 toast.error(`Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-            })
-            toast.promise(s, {
-                loading: 'Registering…',
-                error: (err) => `Registration failed: ${err.message}`,
-            })
-            
-           } catch (error) {
-            console.log("error" , error);
-            toast.error(`Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-            
-            
-           }
+
+
+            }
 
         },
         onSuccess: () => {
@@ -177,7 +168,7 @@ function Register({ setMode }: { setMode: React.Dispatch<React.SetStateAction<"l
 
         },
         onError: (error) => {
-            console.error('Registration failed:', error);
+            toast.error(`Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     })
     const handleRegister = () => {

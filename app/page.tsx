@@ -1,5 +1,6 @@
 "use client";
 
+import { Github, Linkedin, FileText, Link } from "lucide-react";
 
 import Nav from "@/components/Nav";
 import Image from "next/image";
@@ -8,6 +9,7 @@ import BrickWall from "@/components/BrickWall";
 import ProjectCard from "@/components/ProjectCard";
 import { api } from "@/lib/trpc";
 import SpaceLoadingScreen from "@/components/LoadingScreen";
+import ContactButtons from "@/components/ContactButtons";
 
 
 export default function Home() {
@@ -18,10 +20,10 @@ export default function Home() {
   )
 
   return (
-    <div className="flex flex-col m-auto max-w-[85rem] min-w-[85rem]    min-h-screen relative">
+    <div className="flex flex-col m-auto max-w-[85rem] min-w-[85rem] snap-y snap-mandatory scroll-smooth    min-h-screen relative">
       <Nav />
 
-      <div className=" flex flwx-row justify-center items-center w-full h-[95vh] border ">
+      <section  id="about" className=" snap-start flex flwx-row justify-center items-center w-full h-[95vh] border ">
         {/* img amd abuot me  */}
 
         <div className="relative w-70 h-70 md:w-80 md:h-80  overflow-hidden  flex-shrink-0">
@@ -32,7 +34,6 @@ export default function Home() {
             className="object-cover"
           />
         </div>
-
 
         {/* Text Column */}
         <div className="mt-8 md:mt-0 md:ml-12 max-w-2xl text-center md:text-left">
@@ -46,37 +47,12 @@ export default function Home() {
             thoughtful execution, and the drive to build meaningful digital experiences.
           </p>
 
-
-          <div className="mt-6 flex flex-row gap-4 justify-center items-center">
-            <Button
-              size="lg"
-              className="inline-flex items-baseline space-x-0"
-            >
-              <span className="text-gray-900 text-2xl leading-none">G</span>
-              <span className="text-base leading-none">itHub</span>
-            </Button>
-
-            <Button
-              size="lg"
-              className="inline-flex items-baseline space-x-0"
-            >
-              <span className="text-blue-600 text-2xl leading-none">L</span>
-              <span className="text-base leading-none">inkedIn</span>
-            </Button>
-
-            <Button
-              size="lg"
-              className="inline-flex items-baseline space-x-0"
-            >
-              <span className="text-green-500 text-2xl leading-none">R</span>
-              <span className="text-base leading-none">esume</span>
-            </Button>
-          </div>
+        <ContactButtons />
 
         </div>
-      </div>
+      </section>
 
-      <div className="w-full h-[95vh] border p-6 flex flex-col gap-1.5 ">
+      <section id="skills" className=" snap-start w-full h-[95vh] border p-6 flex flex-col gap-1.5 ">
         {/* the skill */}
         {/* <Corner variant="start" size={20} color="red" />
         <Corner variant="mid" size={20} color="red" />
@@ -97,8 +73,8 @@ export default function Home() {
           />
 
         </div>
-      </div>
-      <div className="w-full h-[95vh] border flex flex-col gap-4 p-4">
+      </section>
+      <section id="projects" className=" snap-start w-full h-[95vh] border flex flex-col gap-4 p-4">
         {/* the project section */}
 
         <h1 className="text-4xl font-bold text-center mt-6">Projects</h1>
@@ -122,7 +98,7 @@ export default function Home() {
           }
 
         </div>
-      </div>
+      </section>
     </div>
   );
 }

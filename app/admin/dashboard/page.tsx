@@ -198,7 +198,7 @@ export default function Page() {
                     <h1 className='text-3xl font-bold'>Admin Dashboard</h1>
                     <p className='text-muted-foreground'>Manage your projects and settings here.</p>
 
-                    <div className='flex flex-row flex-wrap gap-4 flex-1'>
+                    <div className='flex flex-row flex-wrap justify-center gap-5 '>
                         {
                             getProjectsShowcase && getProjectsShowcase.data ? (
                                 getProjectsShowcase.data.map((project) => (
@@ -407,7 +407,7 @@ function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh, setIm
                     <DialogTitle>
                         {config.mode === "create" ? "Create New Project" : "Update Project"}
                     </DialogTitle>
-                    <div className='flex flex-col gap-2 p-3 min-h-40 max-h-100 overflow-y-auto'>
+                    <div className='flex flex-col gap-2 p-3 min-h-40 max-h-140 overflow-y-auto'>
 
                         {isMounted && (<>
                             <div className='grid grid-cols-2 gap-3'>

@@ -24,83 +24,74 @@ export default function ProjectCard({
   onEdit
 }: ProjectCardProps) {
   return (
-    <div
-      className="
-        p-px
-        bg-gradient-to-r from-purple-700/50 via-indigo-600/50 to-pink-600/50
-        rounded-2xl
-        hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]
-        transition-shadow duration-300
+   <div
+  className="
+    p-px
+    bg-gradient-to-tr from-purple-800/40 via-indigo-700/40 to-pink-700/40
+    rounded-2xl
+    shadow-[0_0_25px_#9333ea40] hover:shadow-[0_0_35px_#9333ea70]
+    transition-shadow duration-300
+    max-w-sm md:max-w-md w-full shrink-0
+  "
+>
+  <ProjectCardLinkMode
+    id={id}
+    mode={devMode}
+    className="
+      bg-black/20
+      backdrop-blur-md
+      rounded-2xl
+      p-4 flex flex-col gap-3
+      text-white transition-all
+    "
+  >
+    <h3 className="text-2xl font-semibold text-cyan-100">{title}</h3>
 
-        w-full             
-        max-w-sm         
-        md:max-w-md        
-        min-w-[8rem]     
-        shrink-0
-        h-full
-        
-      "
-    >
-      <ProjectCardLinkMode
-        id={id}
-        mode={devMode}
-        className="
-          bg-black/10              /* lighter overlay */
-          backdrop-blur-sm 
-          rounded-xl
-          p-3
-          flex flex-col gap-3
-          text-white
-                
-        "
-      >
-        <h3 className="text-2xl font-semibold">{title}</h3>
-
-        <div className="flex flex-wrap gap-2">
-          {tools.length > 5 ? (
-            <>
-              {tools.slice(0, 5).map((tool, i) => (
-                <Badge
-                  key={i}
-                  className="bg-purple-800/80 text-white rounded-full px-2 py-1 text-sm"
-                >
-                  {tool}
-                </Badge>
-              ))}
-              <Badge className="bg-purple-800/80 text-white rounded-full px-2 py-1 text-sm">
-                +{tools.length - 5}
-              </Badge>
-            </>
-          ) : (
-            tools.map((tool, i) => (
-              <Badge
-                key={i}
-                className="bg-purple-800/80 text-white rounded-full px-2 py-1 text-sm"
-              >
-                {tool}
-              </Badge>
-            ))
-          )}
-        </div>
-
-        {devMode && (
-          <div className="pt-4 border-t border-gray-700/30 flex gap-2">
-            <Button variant="destructive" className="flex-1" onClick={onDelete}>
-              Delete
-            </Button>
-          
-              <Button
-                onClick={onEdit}
-                variant="outline"
-                className="flex-1 border-white text-white hover:bg-white/10"
-              >
-                Update
-              </Button>
-            
-          </div>
-        )}
-      </ProjectCardLinkMode>
+    <div className="flex flex-wrap gap-2">
+      {tools.length > 5 ? (
+        <>
+          {tools.slice(0, 5).map((tool, i) => (
+            <Badge
+              key={i}
+              className="bg-gradient-to-br from-violet-700 to-fuchsia-700 text-white rounded-full px-3 py-1 text-sm shadow-sm hover:shadow-md"
+            >
+              {tool}
+            </Badge>
+          ))}
+          <Badge className="bg-gradient-to-br from-violet-700 to-fuchsia-700 text-white rounded-full px-3 py-1 text-sm shadow-sm">
+            +{tools.length - 5}
+          </Badge>
+        </>
+      ) : (
+        tools.map((tool, i) => (
+          <Badge
+            key={i}
+            className="bg-gradient-to-br from-violet-700 to-fuchsia-700 text-white rounded-full px-3 py-1 text-sm shadow-sm hover:shadow-md"
+          >
+            {tool}
+          </Badge>
+        ))
+      )}
     </div>
+
+    {devMode && (
+      <div className="pt-4 border-t border-white/10 flex gap-2">
+        <Button variant="destructive" className="flex-1" onClick={onDelete}>
+          Delete
+        </Button>
+
+        <Button
+          onClick={onEdit}
+          variant="outline"
+          className="flex-1 border-white text-white hover:bg-white/10"
+        >
+          Update
+        </Button>
+      </div>
+    )}
+  </ProjectCardLinkMode>
+</div>
+
   );
 }
 

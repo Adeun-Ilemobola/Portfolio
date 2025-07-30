@@ -10,6 +10,7 @@ interface ProjectCardProps {
   tools: string[];
   devMode: boolean;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 
@@ -20,6 +21,7 @@ export default function ProjectCard({
   tools,
   devMode,
   onDelete,
+  onEdit
 }: ProjectCardProps) {
   return (
     <div
@@ -86,14 +88,15 @@ export default function ProjectCard({
             <Button variant="destructive" className="flex-1" onClick={onDelete}>
               Delete
             </Button>
-            <Link href={`/project/${id}/update`} passHref>
+          
               <Button
+                onClick={onEdit}
                 variant="outline"
                 className="flex-1 border-white text-white hover:bg-white/10"
               >
                 Update
               </Button>
-            </Link>
+            
           </div>
         )}
       </ProjectCardLinkMode>

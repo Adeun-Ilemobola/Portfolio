@@ -32,7 +32,7 @@ export interface InputBoxProps {
 }
 
 export default function InputBox({ className, value, onChange, label, disabled ,type , ...other }: InputBoxProps) {
-    const [showPassword, setShowPassword] = React.useState(true);
+    const [showPassword, setShowPassword] = React.useState(false);
     return (
         <div className={clsx("flex flex-col gap-2.5 justify-center min-w-20", className)}>
             {label && <Label  className=" ml-1">{label}</Label>}

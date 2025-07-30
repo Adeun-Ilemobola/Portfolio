@@ -10,7 +10,7 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    
+
 } from "@/components/ui/dialog"
 import { FileUploadResult } from '@/lib/utils'
 import { DeleteImages, UploadImageList } from '@/lib/supabase'
@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge'
 import SpaceLoadingScreen from '@/components/LoadingScreen'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import FallBack from '@/components/FallBack'
 
 
 interface ProjectModeProps {
@@ -39,6 +40,8 @@ interface ProjectModProps {
     project: Project;
     setProjectInfo: React.Dispatch<React.SetStateAction<Project | null>>;
     reFresh: () => void
+    setImages: React.Dispatch<React.SetStateAction<FileUploadResult[]>>
+    images: FileUploadResult[]
 }
 export default function Page() {
     const navigate = useRouter();
@@ -50,11 +53,15 @@ export default function Page() {
         mutationFn: async () => {
             try {
                 await authClient.signOut({
-                    fetchOptions:{
+                    fetchOptions: {
                         onSuccess(context) {
-                            console.log('Logout successful' , context);
+                            console.log('Logout successful', context);
                             toast.success('Logout successful');
                             navigate.push('/');
+                        },
+                        onError(context) {
+                            console.error('Logout failed', context);
+                            toast.error('Logout failed');
                         },
                     }
                 })
@@ -66,116 +73,202 @@ export default function Page() {
     })
     const [showaboutRecord, setshowAboutRecord] = React.useState(false);
     const [projectInfo, setProjectInfo] = React.useState<Project | null>(null);
+    const [images, setImages] = React.useState<FileUploadResult[]>([]);
+
+    const fechProjects = api.getProjectById.useMutation({
+        onMutate: () => {
+            toast.loading('Fetching project...', { id: 'project' });
+        },
+
+        onSuccess: (data) => {
+            const { data: item } = data;
+
+            console.log(data);
+            if (data.success && item && item.project) {
+                const project = item.project;
+                const images = item.images.map((img) => ({
+                    supabaseID: img.supabaseID,
+                    name: img.name,
+                    url: img.url,
+                    size: img.size,
+                    type: img.type,
+                    lastModified: new Date(img.lastModified).getMilliseconds(),
+                }));
+                setImages(images);
+
+                setProjectInfo({
+                    ...project,
+                    createdAt: new Date(project.createdAt),
+                    updatedAt: new Date(project.updatedAt),
+                    githubLink: project.githubLink || "",
+                    liveLink: project.liveLink || "",
+
+                });
+                toast.success(data.message, { id: 'project' });
+                setProjectMode({ show: true, mode: "update" });
+
+            } else {
+                toast.error(data.message, { id: 'project' });
+            }
+
+        },
+        onError: (error) => {
+            console.error(error);
+            toast.error(error.message, { id: 'project' });
+        }
+    })
     const { data: getProjectsShowcase, ...getProjectsRest } = api.getProjectsShowcase.useQuery({
         limit: 10,
         offset: 0,
     }
     )
+
+    const delProject = api.deleteProject.useMutation({
+        onMutate: () => {
+            toast.loading('Deleting project...', { id: 'project' });
+        },
+        onSuccess: (data) => {
+            if (data.success) {
+                toast.success(data.value, { id: 'project' });
+                getProjectsRest.refetch();
+                
+            } else {
+                toast.error(data.value, { id: 'project' });
+            }
+        },
+        onError: (error) => {
+            console.error(error);
+            toast.error(error.message, { id: 'project' });
+        }
+    })
     function onDeleteProject(id: string) {
         // Logic to delete a project
         console.log(`Project with ID ${id} deleted`);
+        delProject.mutate({ id: id });
+
+    }
+    function onEditProject(id: string) {
+        // Logic to edit a project
+        console.log(`Project with ID ${id} edited`);
+        fechProjects.mutate({ id: id });
+
 
     }
 
     return (
-        <div className='flex flex-col m-auto max-w-[85rem] min-w-[85rem] min-h-screen relative'>
 
-            <div className='flex justify-between items-center p-5  border-b-[0.4] border-b-blue-500/55 mb-4'>
+        <FallBack loading={getProjectsRest.isLoading || fechProjects.isPending} >
+            <div className='flex flex-col m-auto max-w-[85rem] min-w-[85rem] min-h-screen relative'>
 
-                <Button
-                    variant={"secondary"}
-                    onClick={() => {
+                <div className='flex justify-end gap-2.5 items-center p-5  border-b-[0.4] border-b-blue-500/55 mb-4'>
 
-                        setProjectInfo(defaultProject); // Reset project info for new project creation
-                        setProjectMode({ show: true, mode: "create" })
-                    }}
-                >
-                    Add New Project
-                </Button>
+                    <Button
+                        variant={"secondary"}
+                        onClick={() => {
 
-                <Button
-                    variant={"secondary"}
-                    onClick={() => {
-                        setProjectMode(pre => ({ ...pre, show: false, }));
-                        setshowAboutRecord(true);
-                    }}
-                >
-                    add/update about record
-                </Button>
-                <Button
-                    variant="destructive"
-                    onClick={() => {
-                        // Logic to handle logout
-                        LogOut.mutate();
-                      
-                    }}
-                >
-                    Logout
-                </Button>
-            </div>
+                            setProjectInfo(defaultProject); // Reset project info for new project creation
+                            setProjectMode({ show: true, mode: "create" })
+                        }}
+                    >
+                        Add New Project
+                    </Button>
 
-            <div className='flex flex-col flex-1 h-full  gap-2.5 '>
-                <h1 className='text-3xl font-bold'>Admin Dashboard</h1>
-                <p className='text-muted-foreground'>Manage your projects and settings here.</p>
+                    <Button
+                        variant={"secondary"}
+                        onClick={() => {
+                            setProjectMode(pre => ({ ...pre, show: false, }));
+                            setshowAboutRecord(true);
+                        }}
+                    >
+                        add/update about record
+                    </Button>
+                    <Button
+                        variant="destructive"
+                        onClick={() => {
+                            // Logic to handle logout
+                            LogOut.mutate();
 
-                <div className='flex flex-row flex-wrap gap-4 flex-1'>
-                    {
-                        getProjectsShowcase && getProjectsShowcase.data ? (
-                            getProjectsShowcase.data.map((project) => (
-                                <ProjectCard
-                                    key={project.id}
-                                    id={project.id}
-                                    title={project.title}
-                                    onDelete={() => onDeleteProject(project.id)}
-                                    tools={project.tools} // Assuming tools are not provided in the showcase
-                                    devMode={true} // Assuming devMode is not applicable in the showcase
-                                />
-                            ))
-                        ) : (
-                            <SpaceLoadingScreen fullScreen={false} />
-                        )
-                    }
+                        }}
+                    >
+                        Logout
+                    </Button>
+                </div>
+
+                <div className='flex flex-col flex-1 h-full  gap-2.5 '>
+                    <h1 className='text-3xl font-bold'>Admin Dashboard</h1>
+                    <p className='text-muted-foreground'>Manage your projects and settings here.</p>
+
+                    <div className='flex flex-row flex-wrap gap-4 flex-1'>
+                        {
+                            getProjectsShowcase && getProjectsShowcase.data ? (
+                                getProjectsShowcase.data.map((project) => (
+                                    <ProjectCard
+                                        key={project.id}
+                                        id={project.id}
+                                        title={project.title}
+                                        onDelete={() => onDeleteProject(project.id)}
+                                        tools={project.tools} // Assuming tools are not provided in the showcase
+                                        devMode={true} // Assuming devMode is not applicable in the showcase
+                                        onEdit={() => onEditProject(project.id)}
+                                    />
+                                ))
+                            ) : (
+                                <SpaceLoadingScreen fullScreen={false} />
+                            )
+                        }
+
+                    </div>
 
                 </div>
 
-            </div>
+
+                {ProjectMode.show && projectInfo && (
+
+                    <ProjectMod
+                        config={ProjectMode}
+                        setConfig={setProjectMode}
+                        setImages={setImages}
+                        images={images}
+                        onCreate={() => {
+                            // Logic to handle project creation
+                            console.log("Project created");
+                        }}
+                        onUpdate={() => {
+                            // Logic to handle project update
+                            console.log("Project updated");
+                        }}
+                        project={projectInfo} // Assuming a project object is passed here
+                        setProjectInfo={setProjectInfo}
+                        reFresh={() => { 
+                            getProjectsRest.refetch() 
+                            
+                        }}
+
+                    />
+                )}
 
 
-            {ProjectMode.show && projectInfo && (
-
-                <ProjectMod
-                    config={ProjectMode}
-                    setConfig={setProjectMode}
-                    onCreate={() => {
-                        // Logic to handle project creation
-                        console.log("Project created");
-                    }}
-                    onUpdate={() => {
-                        // Logic to handle project update
-                        console.log("Project updated");
-                    }}
-                    project={projectInfo} // Assuming a project object is passed here
-                    setProjectInfo={setProjectInfo}
-                    reFresh={() => { getProjectsRest.refetch() }}
-
+                <AboutRecord
+                    setshowAboutRecord={setshowAboutRecord}
+                    showaboutRecord={showaboutRecord}
                 />
-            )}
 
 
-            <AboutRecord
-                setshowAboutRecord={setshowAboutRecord}
-                showaboutRecord={showaboutRecord}
-            />
-
-
-        </div>
+            </div>
+        </FallBack>
     )
 }
 
-function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh }: ProjectModProps) {
+function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh, setImages, images }: ProjectModProps) {
     // Logic for project creation or update modal
-    const [images, setImages] = React.useState<FileUploadResult[]>([]);
     const [isUploading, setUploading] = React.useState(false);
+    const [isMounted, setIsMounted] = React.useState(false);
+
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     const Session = authClient.useSession();
     const createProject = api.createProject.useMutation({
         onSuccess(data, variables) {
@@ -198,6 +291,33 @@ function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh }: Pro
             }
             setUploading(false);
         },
+    })
+    const removeImage = api.DelImages.useMutation({
+        onMutate() {
+            toast.loading("Removing image", { id: "removeImage" });
+        },
+        onSuccess() {
+            toast.success("Image removed", { id: "removeImage" });
+        },
+        onError(error) {
+            toast.error(error.message, { id: "removeImage" });
+        },
+
+    })
+    const UpdateProject = api.updataProject.useMutation({
+        onMutate() {
+            toast.loading("Updating project", { id: "updateProject" });
+
+        },
+        onSuccess() {
+            toast.success("Project updated", { id: "updateProject" });
+            setConfig({ ...config, show: false });
+            reFresh();
+        },
+        onError(error) {
+            toast.error(error.message, { id: "updateProject" });
+        },
+        
     })
     const DisableInputs = createProject.isPending || isUploading;
 
@@ -236,23 +356,25 @@ function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh }: Pro
 
 
             if (config.mode === "create") {
-                console.log("send data to create project", project, uploadedImageToDB);
-
-                const r = createProject.mutateAsync({
+                console.log("send data to create project", { project, uploadedImageToDB, images });
+                createProject.mutate({
                     project: {
                         ...project,
-
                     },
                     images: [...uploadedImageToDB]
                 })
-                toast.promise(r, {
-                    loading: 'Creating project…',
-                    success: 'Process finished',
-                    error: (err) => `project failed: ${err.message}`,
-                })
+               
                 setProjectInfo(defaultProject); // Reset project info for new project creation
             } else if (config.mode === "update") {
+                console.log("send data to update project", { project, uploadedImageToDB, images });
+                UpdateProject.mutate({
+                    project: {
+                        ...project,
+                    },
+                    images: [...uploadedImageToDB]
+                })
                 setProjectInfo(null); // Reset project info for update
+
             }
             setUploading(false);
 
@@ -280,102 +402,102 @@ function ProjectMod({ config, setConfig, setProjectInfo, project, reFresh }: Pro
             }
         }}>
 
-            <DialogContent className='min-w-4xl'>
+            <DialogContent className='min-w-4xl  ' suppressHydrationWarning>
                 <DialogHeader>
                     <DialogTitle>
                         {config.mode === "create" ? "Create New Project" : "Update Project"}
                     </DialogTitle>
-                    <DialogDescription className=' flex flex-col gap-2 p-3'>
-                        <div className='grid grid-cols-2 gap-3'>
-                            <InputBox
-                                label="Project Title"
-                                placeholder="Enter project title"
-                                value={project.title}
-                                onChange={(e) => setProjectInfo({ ...project, title: e })}
-                                disabled={DisableInputs}
-                            />
-                            <InputBox
-                                label="github Link"
-                                placeholder="Enter GitHub link"
-                                value={project.githubLink || ''}
-                                onChange={(e) => setProjectInfo({ ...project, githubLink: e })}
-                                disabled={DisableInputs}
-                            />
-                            <InputBox
-                                label="Live Link"
-                                placeholder="Enter live project link"
-                                value={project.liveLink || ''}
-                                onChange={(e) => setProjectInfo({ ...project, liveLink: e })}
-                                disabled={DisableInputs}
-                            />
-                            <SelectBox
-                                label=" is Public"
-                                value={project.isPublic ? "true" : "false"}
-                                onChange={(value) => setProjectInfo({ ...project, isPublic: value === "true" })}
+                    <div className='flex flex-col gap-2 p-3 min-h-40 max-h-100 overflow-y-auto'>
+
+                        {isMounted && (<>
+                            <div className='grid grid-cols-2 gap-3'>
+                                <InputBox
+                                    label="Project Title"
+                                    placeholder="Enter project title"
+                                    value={project.title}
+                                    onChange={(e) => setProjectInfo({ ...project, title: e })}
+                                    disabled={DisableInputs}
+                                />
+                                <InputBox
+                                    label="github Link"
+                                    placeholder="Enter GitHub link"
+                                    value={project.githubLink || ''}
+                                    onChange={(e) => setProjectInfo({ ...project, githubLink: e })}
+                                    disabled={DisableInputs}
+                                />
+                                <InputBox
+                                    label="Live Link"
+                                    placeholder="Enter live project link"
+                                    value={project.liveLink || ''}
+                                    onChange={(e) => setProjectInfo({ ...project, liveLink: e })}
+                                    disabled={DisableInputs}
+                                />
+                                <SelectBox
+                                    label=" is Public"
+                                    value={project.isPublic ? "true" : "false"}
+                                    onChange={(value) => setProjectInfo({ ...project, isPublic: value === "true" })}
+                                    options={[
+                                        { value: "true", label: "Public" },
+                                        { value: "false", label: "Private" }
+                                    ]}
+                                    disabled={DisableInputs}
+                                />
+                            </div>
+                            <SelectorBox
+                                label="Technologies Used"
+
+                                value={(project.technologies)}
+                                onChange={(value) => setProjectInfo({ ...project, technologies: value })}
                                 options={[
-                                    { value: "true", label: "Public" },
-                                    { value: "false", label: "Private" }
+                                    { value: "React", label: "React" },
+                                    { value: "Next.js", label: "Next.js" },
+                                    { value: "Node.js", label: "Node.js" },
+                                    { value: "Express", label: "Express" },
+                                    { value: "MongoDB", label: "MongoDB" },
+                                    { value: "PostgreSQL", label: "PostgreSQL" },
+                                    { value: "Supabase", label: "Supabase" },
+                                    { value: "Tailwind CSS", label: "Tailwind CSS" },
+                                    { value: "Chakra UI", label: "Chakra UI" },
                                 ]}
+                                placeholder='Select technologies used in the project'
                                 disabled={DisableInputs}
                             />
-                        </div>
-                        <SelectorBox
-                            label="Technologies Used"
+                            <TextAreaBox
+                                label="Project Description"
+                                value={project.description}
+                                onChange={(e) => setProjectInfo({ ...project, description: e })}
+                                placeholder="Enter project description"
+                                disabled={DisableInputs}
+                            />
 
-                            value={(project.technologies)}
-                            onChange={(value) => setProjectInfo({ ...project, technologies: value })}
-                            options={[
-                                { value: "React", label: "React" },
-                                { value: "Next.js", label: "Next.js" },
-                                { value: "Node.js", label: "Node.js" },
-                                { value: "Express", label: "Express" },
-                                { value: "MongoDB", label: "MongoDB" },
-                                { value: "PostgreSQL", label: "PostgreSQL" },
-                                { value: "Supabase", label: "Supabase" },
-                                { value: "Tailwind CSS", label: "Tailwind CSS" },
-                                { value: "Chakra UI", label: "Chakra UI" },
-                            ]}
-                            placeholder='Select technologies used in the project'
-                            disabled={DisableInputs}
-                        />
-                        <TextAreaBox
-                            label="Project Description"
-                            value={project.description}
-                            onChange={(e) => setProjectInfo({ ...project, description: e })}
-                            placeholder="Enter project description"
-                            disabled={DisableInputs}
-                        />
-                        <ImageDragDrop
-                            images={images}
-                            setImages={setImages}
-                            DeleteImages={async (paths) => {
-                                // Logic to delete images from Supabase
-                                console.log("Deleting images:", paths);
-                                await DeleteImages(paths);
-                            }}
+                            <ImageDragDrop
+                                images={images}
+                                setImages={setImages}
+                                DeleteImages={async (paths, index) => {
+                                    // Logic to delete images from Supabase
+                                    if (paths.length > 0) {
+                                        removeImage.mutate({ supabaseID: paths })
+                                    } 
+                                     setImages(prevImages => prevImages.filter((_, i) => i !== index));
+                                }}
 
 
-                        />
-
-                        <Button
-                            className='w-full'
-                            onClick={() => {
-                                onSuccess();
-                            }}
-                            disabled={DisableInputs}
-                        >
-                            {config.mode === "create" ? (DisableInputs ? "Creating Project..." : "Create Project") : (DisableInputs ? "Updating Project..." : "Update Project")}
-                        </Button>
+                            />
 
 
+                            <Button
+                                className='w-full'
+                                onClick={() => {
+                                    onSuccess();
+                                }}
+                                disabled={DisableInputs}
+                            >
+                                {config.mode === "create" ? (DisableInputs ? "Creating Project..." : "Create Project") : (DisableInputs ? "Updating Project..." : "Update Project")}
+                            </Button>
 
-
-
-
-
-
-
-                    </DialogDescription>
+                        </>
+                        )}
+                    </div>
                 </DialogHeader>
             </DialogContent>
         </Dialog>
@@ -488,9 +610,9 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
             }
             await DeactivateRecord();
             const aboutSend = UpdateMut.mutateAsync({
-                    id: vAboutRecord.data.id,
-                    content: vAboutRecord.data.content,
-                    isPublic: vAboutRecord.data.isPublic,
+                id: vAboutRecord.data.id,
+                content: vAboutRecord.data.content,
+                isPublic: vAboutRecord.data.isPublic,
             })
             toast.promise(aboutSend, {
                 loading: 'Updating record…',
@@ -516,110 +638,110 @@ function AboutRecord({ showaboutRecord, setshowAboutRecord }: aboutRecordProps) 
                 </DialogHeader>
 
                 <div className='flex flex-col gap-1'>
-                            <h1 className='text-[1.1rem]'>Record history</h1>
-                            <div className='flex flex-row gap-2 p-1.5 flex-1 items-center overflow-auto'>
+                    <h1 className='text-[1.1rem]'>Record history</h1>
+                    <div className='flex flex-row gap-2 p-1.5 flex-1 items-center overflow-auto'>
 
-                                <Button
-                                    onClick={() => {
-                                        setaboutRecord(defaultAbout);
-                                        setOperationMode("create");
-                                    }}
+                        <Button
+                            onClick={() => {
+                                setaboutRecord(defaultAbout);
+                                setOperationMode("create");
+                            }}
 
-                                >
-                                    --<PackagePlus />--
-                                </Button>
+                        >
+                            --<PackagePlus />--
+                        </Button>
 
-                                {getAllAboutRecords.isPending ?
-                                    (
+                        {getAllAboutRecords.isPending ?
+                            (
 
-                                        <>
-                                            <div className=' flex-1  w-full'>
-                                                <span className='flex flex-row gap-2 items-center'>
-                                                    <LoaderCircle className='animate-spin' />
-                                                    <span className='text-[1rem]'>Loading...</span>
-                                                </span>
-                                            </div>
-                                        </>
+                                <>
+                                    <div className=' flex-1  w-full'>
+                                        <span className='flex flex-row gap-2 items-center'>
+                                            <LoaderCircle className='animate-spin' />
+                                            <span className='text-[1rem]'>Loading...</span>
+                                        </span>
+                                    </div>
+                                </>
 
-                                    )
-                                    : (
-                                        <>
-                                            {aboutRecordList.map((record) => (
+                            )
+                            : (
+                                <>
+                                    {aboutRecordList.map((record) => (
 
-                                                <Button
-                                                    key={record.id}
-                                                    variant={record.isPublic ? "default" : "secondary"}
-                                                    className={
-                                                        aboutRecord?.id === record.id ? "text-fuchsia-800" : ""
-                                                    }
-                                                    onClick={() => {
-                                                        setaboutRecord(record);
-                                                        setOperationMode("update");
-                                                    }}
-                                                >
-                                                    {record.createdAt.toLocaleString()}
-                                                </Button>
+                                        <Button
+                                            key={record.id}
+                                            variant={record.isPublic ? "default" : "secondary"}
+                                            className={
+                                                aboutRecord?.id === record.id ? "text-fuchsia-800" : ""
+                                            }
+                                            onClick={() => {
+                                                setaboutRecord(record);
+                                                setOperationMode("update");
+                                            }}
+                                        >
+                                            {record.createdAt.toLocaleString()}
+                                        </Button>
 
-                                            ))}
-                                        </>
-                                    )
-                                }
-
-
-
-
-
-                            </div>
-                        </div>
-                        {aboutRecord ? (
-                            <>
-                                <TextAreaBox
-                                    label={
-                                        <div className='flex flex-row gap-2.5 items-center p-1.5'>
-                                            <p className='text-[1rem]'>Record Description</p>
-                                            <Badge variant={aboutRecord.isPublic ? "public" : "private"} size="sm">
-                                                {aboutRecord.isPublic ? "Public" : "Private"}
-                                            </Badge>
-                                        </div>
-                                    }
-                                    value={aboutRecord.content}
-                                    onChange={(e) => setaboutRecord({ ...aboutRecord, isPublic: true, content: e, updatedAt: new Date() })}
-                                    placeholder="Enter record description"
-                                    disabled={DisableInputs}
-                                    className='flex-1 min-h-[20rem]'
-                                />
-
-                                <Button
-                                    className='w-full'
-                                    onClick={() => {
-                                        onSuccess();
-                                    }}
-                                    disabled={DisableInputs}
-                                >
-                                    {operationMode === "create" ? (DisableInputs ? "Creating Record..." : "Create Record") : (DisableInputs ? "Updating Record..." : "Update Record")}
-                                </Button>
-
-                            </>
-
-                        ) : (
-                            <>
-                                <div className='flex flex-col gap-2 p-1.5 justify-center items-center flex-1'>
-                                    <h1>No Record Selected or Created</h1>
-                                    <Button
-                                        onClick={() => {
-                                            setaboutRecord(defaultAbout);
-                                            setOperationMode("create");
-                                        }}
-                                    >
-                                        --<PackagePlus />--
-                                    </Button>
-                                </div>
-
-                            </>
-
-                        )
-
+                                    ))}
+                                </>
+                            )
                         }
+
+
+
+
+
+                    </div>
+                </div>
+                {aboutRecord ? (
+                    <>
+                        <TextAreaBox
+                            label={
+                                <div className='flex flex-row gap-2.5 items-center p-1.5'>
+                                    <p className='text-[1rem]'>Record Description</p>
+                                    <Badge variant={aboutRecord.isPublic ? "public" : "private"} size="sm">
+                                        {aboutRecord.isPublic ? "Public" : "Private"}
+                                    </Badge>
+                                </div>
+                            }
+                            value={aboutRecord.content}
+                            onChange={(e) => setaboutRecord({ ...aboutRecord, isPublic: true, content: e, updatedAt: new Date() })}
+                            placeholder="Enter record description"
+                            disabled={DisableInputs}
+                            className='flex-1 min-h-[20rem]'
+                        />
+
+                        <Button
+                            className='w-full'
+                            onClick={() => {
+                                onSuccess();
+                            }}
+                            disabled={DisableInputs}
+                        >
+                            {operationMode === "create" ? (DisableInputs ? "Creating Record..." : "Create Record") : (DisableInputs ? "Updating Record..." : "Update Record")}
+                        </Button>
+
+                    </>
+
+                ) : (
+                    <>
+                        <div className='flex flex-col gap-2 p-1.5 justify-center items-center flex-1'>
+                            <h1>No Record Selected or Created</h1>
+                            <Button
+                                onClick={() => {
+                                    setaboutRecord(defaultAbout);
+                                    setOperationMode("create");
+                                }}
+                            >
+                                --<PackagePlus />--
+                            </Button>
+                        </div>
+
+                    </>
+
+                )
+
+                }
 
             </DialogContent>
 

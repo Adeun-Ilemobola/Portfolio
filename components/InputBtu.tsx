@@ -28,6 +28,7 @@ export default function InputBtu({  onSubmit, className  , icon ,disabled }: Inp
                 }
             }}
             placeholder="Type and press Enter"
+            disabled={disabled}
           
         />
         <Button
@@ -38,6 +39,7 @@ export default function InputBtu({  onSubmit, className  , icon ,disabled }: Inp
             disabled={!value.trim() || disabled}
             variant={"outline"}
             size={"icon"}
+            
         >
             {icon || <ScanSearch className="h-4 w-4" />}
 

@@ -1,10 +1,8 @@
 "use client";
 
-import { Github, Linkedin, FileText, Link } from "lucide-react";
 
 import Nav from "@/components/Nav";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import BrickWall from "@/components/BrickWall";
 import ProjectCard from "@/components/ProjectCard";
 import { api } from "@/lib/trpc";

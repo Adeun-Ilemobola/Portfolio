@@ -18,8 +18,8 @@ export default function Starfield() {
   useEffect(() => {
     const count = 300; // tweak up or down
     const newStars: Star[] = Array.from({ length: count }).map(() => {
-      let randColorList = ["#A48CFF", "#FF4FA8", "#2FFFE3", "#1A2CFF", "#FFC94D"];
-      let randColorNum = Math.floor(Math.random() * 4);
+      const randColorList = ["#A48CFF", "#FF4FA8", "#2FFFE3", "#1A2CFF", "#FFC94D"];
+      const randColorNum = Math.floor(Math.random() * 4);
       return{
       cx: Math.random() * 100,                // percent
       cy: Math.random() * 100,                // percent

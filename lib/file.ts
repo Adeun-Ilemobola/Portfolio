@@ -28,9 +28,9 @@ export async function File_To_FileXList(params:File[]){
     return Promise.all(params.map(file => FileToBase64(file)));  
 }
 export function FileX_To_Blub(FileList:FileX[]):FileX[][] {
-    let result:FileX[][] = [];
+    const result:FileX[][] = [];
     let temp:FileX[] = [];
-    let maxTemp = 3;
+    const maxTemp = 3;
     FileList.forEach((file, index) => {
         temp.push(file);
         if (temp.length === maxTemp || index === FileList.length - 1) {

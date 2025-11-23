@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Starfield from "@/components/Starfield";
+import { TRPCProvider } from "@/lib/client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,12 +27,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  ///bg-linear-to-br from-slate-100/10 via-blue-50/10 to-purple-100/10 font-sans dark:from-[#0a0e1a]/10 dark:via-[#101726]/10 dark:to-[#1a1030]/10
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TRPCProvider>
+          <Starfield />
+          <main className="relative bg-linear-to-br from-slate-100/10 via-blue-50/10 to-purple-100/10 font-sans dark:from-[#0a0e1a]/10 dark:via-[#101726]/10 dark:to-[#1a1030]/10 ">
+            {children}
+          </main>
+
+         
+          <Toaster richColors position="bottom-right" />
+          </TRPCProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

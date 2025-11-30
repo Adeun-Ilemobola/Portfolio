@@ -5,9 +5,14 @@ export const  ContactSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
   email: z.email({ message: "Invalid email address" }),
   message: z.string().min(10, { message: "Message must be at least 10 characters long" }),
-  company: z.string().optional(),
+  company: z.string().nullable(),
 });
+export const  ContactSchemaID = ContactSchema.extend({ id: z.string() });
 export type ContactType = z.infer<typeof ContactSchema>;
+export type ContactIDType = z.infer<typeof ContactSchemaID>;
+
+
+
 
 
 export const SkillSchema = z.object({
@@ -34,12 +39,13 @@ export const ProjectSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters long" }),
   description: z.string().min(20, { message: "Description must be at least 20 characters long" }),
   link: z.url({ message: "Invalid URL format" }),
-  technologies: z.array(SkillSchema).min(1, { message: "At least one technology must be specified" }),
+  technologies: z.array(z.string()).min(1, { message: "At least one technology must be specified" }),
   gitHub: z.url({ message: "Invalid GitHub URL format" }),
-  images: z.array(FileXSchema),
-  videos: FileXSchema.optional(),
+  files: z.array(FileXSchema),
+  
 }).superRefine((data, ctx) => {
-  const hasValidImage = data.images.some((file) => file.type === 'image');
+  const hasValidImage = data.files.some((file) => file.type === 'image');
+  const _hasValidVideo = data.files.some((file) => file.type === 'video');
   
   if (!hasValidImage) {
     ctx.addIssue({
@@ -48,15 +54,17 @@ export const ProjectSchema = z.object({
       path: ["images"], // Highlights the 'images' input specifically
     });
   }
-  if (data.videos && data.videos.type !== 'video') {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "The selected file must be a video format.",
-      path: ["videos"],
-    });
-  }
+  // if (hasValidVideo && data.videos.type !== 'video') {
+  //   ctx.addIssue({
+  //     code: z.ZodIssueCode.custom,
+  //     message: "The selected file must be a video format.",
+  //     path: ["videos"],
+  //   });
+  // }
 });
 export type ProjectType = z.infer<typeof ProjectSchema>;
+const ProjectSchemaID = ProjectSchema.extend({ id: z.string() });
+export type ProjectIDType = z.infer<typeof ProjectSchemaID>;
 
 
 

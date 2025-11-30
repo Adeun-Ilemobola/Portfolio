@@ -25,7 +25,7 @@ type ProjectCardProps = {
 };
 
 export default function ProjectCard({ data, url, eidtMode }: ProjectCardProps) {
-    const skillSet = data.technologies.map((tech) => tech.name);
+    const skillSet = data.technologies;
     const maxItemsToShow = 4;
     const firstThreeItems = skillSet.slice(0, maxItemsToShow);
     const getRemainingItems = skillSet.slice(
@@ -54,7 +54,7 @@ export default function ProjectCard({ data, url, eidtMode }: ProjectCardProps) {
 
                 <div className="flex items-center justify-center flex-1 overflow-hidden">
                     <Image
-                        src={data.images[0].link}
+                        src={data.files[0].link}
                         alt={data.title}
                         width={400}
                         height={300}

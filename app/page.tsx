@@ -1,8 +1,10 @@
 "use client";
 
+import ContactSLide from "@/components/ContactSLide";
 import ImgList from "@/components/ImgList";
 import Nav from "@/components/Nav";
 import ProjectCard from "@/components/ProjectCard";
+import { Button } from "@/components/ui/button";
 import { MOCK_PROJECTS } from "@/lib/testObject";
 import { FileX } from "@/lib/type";
 import { useState } from "react";
@@ -22,10 +24,22 @@ export default function Home() {
   // const [result, setResult] = useState<string[]>([]);
   const [files, setFiles] = useState<FileX[]>([]);
   const [mainFile, setMainFile] = useState<FileX | null>(null);
+  const [show  , setShow] = useState(false)
 
   return (
     <div className=" flex flex-col">
       <Nav />
+     {show &&  <ContactSLide setShowContact={setShow} showContact={show}/>}
+      <Button
+      variant={"secondary"}
+      className=" absolute  top-10"
+      onClick={()=>{
+        setShow(!show)
+      }}
+      >
+      {show ? "Hide" : "Show"}
+
+      </Button>
       {/*  */}
 
       <section
@@ -117,6 +131,9 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+
+
       <section
         id={"Projects".toLowerCase()}
         className=" min-h-screen min-w-full p-6 flex flex-col "

@@ -9,3 +9,25 @@ export type FileX = {
     tags : string[];
     link: string;
 }
+
+export type State<T> = 
+    {
+        stateType: 'error';
+        message: string;
+
+    }|
+    {
+        stateType: 'success';
+        data: T;
+    };
+
+
+    export type  projectsListViewType = {
+        id: string
+        title: string;
+        link: string;
+        technologies: string[];
+        files: FileX & { 
+            id: string
+        }| undefined
+    }

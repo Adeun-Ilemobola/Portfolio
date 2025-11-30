@@ -79,9 +79,9 @@ export const MOCK_PROJECTS: ProjectType[] = Array.from({ length: 30 }, (_, i) =>
     gitHub: `https://github.com/username/project-horizon-${i + 1}`,
     
     // 3. Use the new random generator here
-    technologies: generateRandomTechnologies(3, 6),
+    technologies: generateRandomTechnologies(3, 6).map(skill => skill.name),
 
-    images: [
+    files: [
       generateRandomImage(i),
       ...(i % 3 === 0 ? [generateRandomImage(i + 10)] : [])
     ],

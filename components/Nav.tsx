@@ -1,8 +1,13 @@
+'use client'
+
 import React from 'react';
 import { Button } from './ui/button';
 import { motion } from "motion/react";
+import { usePathname } from 'next/navigation'
+import { IconBrandAuth0 } from '@tabler/icons-react';
 
 export default function Nav() {
+  const pathname = usePathname()
   return (
     <motion.div
       initial={{ x: -120, opacity: 0 }}
@@ -57,6 +62,39 @@ export default function Nav() {
           {label}
         </Button>
       ))}
+
+
+      {pathname.includes("Auth") && (
+        <Button
+          variant="ghost"
+          size={"icon-lg"}
+          onClick={() => {
+         
+          }}
+          className="
+            relative h-9 px-4 text-sm font-medium tracking-wide transition-all duration-300 rounded-full
+            
+            /* Text Colors */
+            text-gray-700 dark:text-gray-200
+
+            /* Hover States - Accent Token: Light [#059669] | Dark [#6ee7b7] */
+            hover:text-[#059669] hover:bg-[#059669]/10
+            dark:hover:text-[#6ee7b7] dark:hover:bg-[#6ee7b7]/10
+
+            /* Interactive Underline Animation */
+            after:absolute after:bottom-1.5 after:left-1/2 after:-translate-x-1/2 
+            after:h-[2px] after:w-0 after:rounded-full 
+            after:transition-all after:duration-300 
+            hover:after:w-1/2 
+
+            /* Underline Color - Highlight Token: Light [#e11d48] | Dark [#fda4af] */
+            after:bg-[#e11d48] dark:after:bg-[#fda4af]
+          "
+        >
+          <IconBrandAuth0 stroke={2} />
+        </Button>
+      )}      
+
     </motion.div>
   );
 }

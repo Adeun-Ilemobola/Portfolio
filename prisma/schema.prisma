@@ -63,8 +63,7 @@ model Skill {
   category  String
   size      SkillSize
   
-  // Relation: A skill can be used in many projects
-  projects  Project[] 
+ 
 }
 
 model File {
@@ -74,7 +73,7 @@ model File {
   size      Float    // z.number() (Float is best for file sizes in DB)
   path      String
   tags      String[] // z.array(z.string()) - Postgres supports arrays natively
-  link      String?  // z.string() (mapped to nullable since it might be empty)
+  link      String  // z.string() (mapped to nullable since it might be empty)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,7 +91,7 @@ model Project {
   gitHub      String   // z.url()
   
   // Relations
-  technologies Skill[] // z.array(SkillSchema)
+  technologies String[] // z.array(String)
   files        File[]  // Covers both 'images' and 'videos'
   
   createdAt    DateTime @default(now())

@@ -1,4 +1,11 @@
-import { FileX } from "./type";
+import { FileX } from "./ZodObject";
+function normalizeType(file: File): FileX["type"] {
+  if (file.type.startsWith("image/")) return "image";
+  if (file.type.startsWith("video/")) return "video";
+  if (file.type.startsWith("audio/")) return "audio";
+  if (file.type.includes("pdf")) return "document";
+  return "other";
+}
 
 
 function FileToBase64(params:File):Promise<FileX> {
@@ -7,9 +14,7 @@ function FileToBase64(params:File):Promise<FileX> {
         reader.readAsDataURL(params);
         reader.onload = () => {
             const fileX:FileX = {
-                type: params.type.startsWith('image/') ? 'image' : params.type.startsWith('video/') ? 'video' :
-                      params.type.startsWith('audio/') ? 'audio' :
-                      params.type === 'application/pdf' ? 'document' : 'other',
+                type: normalizeType(params),
                 name: params.name,
                 size: params.size,  
                 link: reader.result as string,

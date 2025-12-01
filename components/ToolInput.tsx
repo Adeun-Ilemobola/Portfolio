@@ -22,6 +22,7 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { toast } from "sonner";
 type ToolInputProps = {
     onUpdate: Dispatch<SetStateAction<string[]>>;
     result: string[];
@@ -37,6 +38,12 @@ export default function TooLInput(
     const firstThreeItems = result.slice(0, maxItems);
     const getRemainingItems = result.slice(maxItems, result.length);
     function Add() {
+        if (result.includes(text)) {
+            toast.error("This item already exists.");
+            return
+        };
+
+
         if (text.trim() === "") return;
         setIsSended(!isSended);
         onUpdate([...result, text]);
@@ -44,6 +51,9 @@ export default function TooLInput(
         setTimeout(() => {
             setIsSended(false);
         }, 2000);
+    }
+    function remove(item:string) {
+        onUpdate(result.filter((i) => i !== item)); 
     }
 
     return (
@@ -55,7 +65,7 @@ export default function TooLInput(
                     placeholder="Enter your text here..."
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter") {
+                        if (e.key === "Tab") {
                             Add();
                         }
                     }}
@@ -113,7 +123,8 @@ export default function TooLInput(
                                             <Badge
                                                 key={globalIndex}
                                                 variant="secondary"
-                                                className="space-x-2 text-[.8rem]"
+                                                className="space-x-2 text-[.8rem] hover:cursor-pointer hover:underline"
+                                                onClick={() => remove(res)}
                                             >
                                                 <IconInfoCircle size={16} />
                                                 <span>{res}</span>
@@ -130,7 +141,8 @@ export default function TooLInput(
                                 <Badge
                                     key={index}
                                     variant="secondary"
-                                    className="space-x-2 text-[.815rem]"
+                                    className="space-x-2 text-[.815rem] hover:cursor-pointer hover:underline"
+                                    onClick={() => remove(res)}
                                 >
                                     <IconInfoCircle size={16} />
                                     <span>{res}</span>

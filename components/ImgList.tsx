@@ -11,15 +11,15 @@ import { File_To_FileXList } from "@/lib/file";
 import { log } from "console";
 type ImgListProps = {
     files: FileX[];
-    mainFile: FileX | null;
+   
     removeFile: (file: FileX) => void;
-    setFileToMain: (file: FileX) => void;
+   
     updataFiles: (files: FileX[]) => void;
     className?: string;
 };
 
 export default function ImgList(
-    { files, mainFile, setFileToMain, updataFiles, removeFile }: ImgListProps,
+    { files, updataFiles, removeFile }: ImgListProps,
 ) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -40,6 +40,25 @@ export default function ImgList(
             setIsLoading(false);
         }
     }
+
+    function makeFileMain( targetFile:FileX) {
+        const tempList = files.map((file) => {
+            if (file === targetFile) {
+                return {
+                    ...file,
+                    tags: [...file.tags, "XmainTagitypeperX"],
+                };
+            }
+            return {
+                ...file,
+                tags: file.tags.filter((tag) => tag !== "XmainTagitypeperX"),
+            };
+        });
+        updataFiles(tempList);    
+        
+        
+    }
+    
     const handleDivClick = () => {
         fileInputRef.current?.click();
     };
@@ -86,8 +105,8 @@ export default function ImgList(
                             removeFile={removeFile}
                             key={index}
                             file={file}
-                            main={mainFile?.name === file.name}
-                            chageFile={setFileToMain}
+                            main={file.tags.includes("XmainTagitypeperX")}
+                            chageFile={makeFileMain}
                         />
                     ))}
                 </>

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { File_To_FileXList } from "@/lib/file";
 import { cn } from "@/lib/utils"; 
 import { FileX } from "@/lib/ZodObject";
+import { toast } from "sonner";
 type ImgListProps = {
     files: FileX[];
    
@@ -62,12 +63,13 @@ export default function ImgList(
     
     const handleDivClick = () => {
         fileInputRef.current?.click();
+        toast.success("File input opened");
     };
 
     return (
         <Card
             onClick={(e) => {
-                e.preventDefault();
+                
                 e.stopPropagation();
                 handleDivClick();
             }}
@@ -90,12 +92,13 @@ export default function ImgList(
                 setIsDragOver(false);
                 setIsLoading(false);
             }}
-            className={ cn(+`p-2 flex flex-col gap-2 rounded-lg shadow-lg  bg-white/30 dark:bg-gray-800/30 backdrop-blur-xs border border-gray-200 dark:border-gray-700 ${
+            className={ cn(+` flex flex-col gap-2 rounded-lg shadow-lg  bg-white/30 dark:bg-gray-800/30 backdrop-blur-xs border border-gray-200 dark:border-gray-700 ${
                 isDragOver
                     ? "border-dashed border-emerald-400 dark:border-emerald-600"
                     : ""
 
             }`,
+            "py-2 px-2",
             className
         )}
             

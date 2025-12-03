@@ -66,7 +66,9 @@ const generateRandomImage = (index: number): FileX => {
     createdAt: new Date(),
     updatedAt: new Date(),
     tags: ['ui', 'web', 'design'],
-    link: `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&w=${width}&h=${height}&q=80`
+    link: `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&w=${width}&h=${height}&q=80`,
+    mime: 'image/jpeg'
+
   };
 };
 

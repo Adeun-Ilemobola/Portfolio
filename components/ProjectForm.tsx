@@ -21,44 +21,22 @@ import {
 import { toast } from "sonner";
 import { trpc as api } from "@/lib/client";
 import { useState } from "react";
+
 export function ProjectForm() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const createProject = api.CreateProject.useMutation({
-        onMutate: () => {
-            toast.loading("Creating project...", { id: "create-project" });
-            setIsLoading(true);
-        },
-        onSuccess: (data) => {
-            toast.success("Project created successfully!", {
-                id: "create-project",
-            });
-            setIsLoading(false);
-        },
-        onError: (error) => {
-            toast.error(
-                `Failed to create project: ${error.message}`,
-                { id: "create-project" },
-            );
-            setIsLoading(false);
-        },
-
-    });
-    // 1. Define your form.
     const form = useForm({
         defaultValues: {
             title: "",
             description: "",
             link: "",
             gitHub: "",
-            technologies: [] as string[], // Initial state for ToolInput
-            files: [] as FileX[], // Initial state for ImgList
+            technologies: [] as string[],
+            files: [] as FileX[],
         },
 
         validators: {
             onSubmit: ProjectSchema as any,
-            // onChange: zodValidator(ProjectSchema),
-            // onBlur: zodValidator(ProjectSchema),
         },
         onSubmit: (values) => {
             console.log("Form Submitted:", values);
@@ -68,21 +46,14 @@ export function ProjectForm() {
         },
         onSubmitInvalid: (errors) => {
             console.log("Form Submission Errors:", errors);
-
-            console.log("isValidating:", errors.formApi.state.isValidating);
-            console.log("canSubmit:", errors.formApi.state.canSubmit);
-            console.log(
-                "allErrors:",
-                errors.formApi.getAllErrors(),
-            );
-        },
-        onSubmitMeta: (meta: any) => {
-            console.log("Form Meta:", meta);
-            toast.success("Form submitted successfully!", {
-                id: "project-success",
-            });
         },
     });
+
+    // Helper to safely extract error message regardless of format
+    const getErrorMessage = (error: any) => {
+        if (typeof error === "string") return error;
+        return error?.message ?? JSON.stringify(error);
+    };
 
     return (
         <>
@@ -120,7 +91,8 @@ export function ProjectForm() {
                                     <FieldError>
                                         {field.state.meta.errors?.map(
                                             (error, index) => (
-                                                <div key={index}>{error}</div>
+                                                /* FIX: Use .message property */
+                                                <div key={index}>{getErrorMessage(error)}</div>
                                             ),
                                         )}
                                     </FieldError>
@@ -157,7 +129,8 @@ export function ProjectForm() {
                                     <FieldError>
                                         {field.state.meta.errors?.map(
                                             (error, index) => (
-                                                <div key={index}>{error}</div>
+                                                 /* FIX: Use .message property */
+                                                <div key={index}>{getErrorMessage(error)}</div>
                                             ),
                                         )}
                                     </FieldError>
@@ -197,8 +170,9 @@ export function ProjectForm() {
                                         <FieldError>
                                             {field.state.meta.errors?.map(
                                                 (error, index) => (
+                                                   
                                                     <div key={index}>
-                                                        {error}
+                                                        {getErrorMessage(error)}
                                                     </div>
                                                 ),
                                             )}
@@ -239,7 +213,7 @@ export function ProjectForm() {
                                             {field.state.meta.errors?.map(
                                                 (error, index) => (
                                                     <div key={index}>
-                                                        {error}
+                                                        {getErrorMessage(error)}
                                                     </div>
                                                 ),
                                             )}
@@ -273,7 +247,10 @@ export function ProjectForm() {
                                         {field.state.meta.errors?.map((
                                             error,
                                             index,
-                                        ) => <div key={index}>{error}</div>)}
+                                        ) => (
+                                             /* FIX: Use .message property */
+                                            <div key={index}>{getErrorMessage(error)}</div>
+                                        ))}
                                     </FieldError>
                                 )}
                             </Field>
@@ -296,7 +273,6 @@ export function ProjectForm() {
                             <Field data-invalid={isInvalid}>
                                 <FieldLabel>Project Media</FieldLabel>
 
-                                {/* Make blur tracking work */}
                                 <div onBlur={field.handleBlur}>
                                     <ImgList
                                         files={files}
@@ -310,13 +286,17 @@ export function ProjectForm() {
                                         {field.state.meta.errors?.map((
                                             err,
                                             i,
-                                        ) => <div key={i}>{err}</div>)}
+                                        ) => (
+                                             /* FIX: Use .message property */
+                                            <div key={i}>{getErrorMessage(err)}</div>
+                                        ))}
                                     </FieldError>
                                 )}
                             </Field>
                         );
                     }}
                 </form.Field>
+
                 {/* DEBUGGING: Reveal hidden errors */}
                 <div className="bg-red-100 p-4 mt-4 text-xs font-mono text-red-800 rounded">
                     <strong>Form Errors:</strong>

@@ -29,6 +29,7 @@ export const FileXSchema = z.object({
     updatedAt : z.coerce.date(),
     tags : z.array(z.string()),
     link: z.string(),
+    mime: z.string(),
 });
 export type FileX = z.infer<typeof FileXSchema>;
 

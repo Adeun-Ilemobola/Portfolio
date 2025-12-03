@@ -4,6 +4,7 @@ import { Send } from 'lucide-react';
 import { ContactIDType, ContactSchema, ProjectIDType, ProjectSchema } from '@/lib/ZodObject';
 import { projectsListViewType, State } from '@/lib/type';
 import { tr } from 'zod/v4/locales';
+import { FilesToCloud } from '@/lib/file';
 
 export const appRouter = createTRPCRouter({
   // 1. Basic Echo Test
@@ -101,6 +102,7 @@ export const appRouter = createTRPCRouter({
         stateType: 'error',
         message: 'something went wrong'
       };
+      const  uploadedFiles = await FilesToCloud(input.files);
       // send the Contactr to  me 
 
       // send the Contactr to the database
@@ -111,9 +113,10 @@ export const appRouter = createTRPCRouter({
           link: input.link,
           technologies: input.technologies,
           gitHub: input.gitHub,
+          
           files: {
             createMany: {
-              data: input.files
+              data: uploadedFiles
             }
           },
 
@@ -137,6 +140,7 @@ export const appRouter = createTRPCRouter({
               updatedAt: true,
               tags: true,
               link: true,
+              mime: true
             }
           },
 

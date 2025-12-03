@@ -8,26 +8,42 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import TooLInput from "./ToolInput";
 import ImgList from "./ImgList";
-import {
-    FileX,
-    ProjectSchema,
-    ProjectType,
-    
-} from "@/lib/ZodObject";
+import { FileX, ProjectSchema } from "@/lib/ZodObject";
 import {
     Field,
     FieldContent,
     FieldDescription,
     FieldError,
-    FieldGroup,
+  
     FieldLabel,
-    FieldLegend,
-    FieldSeparator,
-    FieldSet,
-    FieldTitle,
+   
 } from "@/components/ui/field";
 import { toast } from "sonner";
+import { trpc as api } from "@/lib/client";
+import { useState } from "react";
 export function ProjectForm() {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const createProject = api.CreateProject.useMutation({
+        onMutate: () => {
+            toast.loading("Creating project...", { id: "create-project" });
+            setIsLoading(true);
+        },
+        onSuccess: (data) => {
+            toast.success("Project created successfully!", {
+                id: "create-project",
+            });
+            setIsLoading(false);
+        },
+        onError: (error) => {
+            toast.error(
+                `Failed to create project: ${error.message}`,
+                { id: "create-project" },
+            );
+            setIsLoading(false);
+        },
+
+    });
     // 1. Define your form.
     const form = useForm({
         defaultValues: {
@@ -151,79 +167,89 @@ export function ProjectForm() {
                     }}
                 />
 
-                <form.Field
-                    name="link"
-                    children={(field) => {
-                        const isInvalid = field.state.meta.isTouched &&
-                            !field.state.meta.isValid;
-                        return (
-                            <Field data-invalid={isInvalid}>
-                                <FieldLabel htmlFor={field.name}>
-                                    Website link
-                                </FieldLabel>
-                                <FieldContent>
-                                    <Input
-                                        id={field.name}
-                                        name={field.name}
-                                        value={field.state.value}
-                                        onBlur={field.handleBlur}
-                                        onChange={(e) =>
-                                            field.handleChange(e.target.value)}
-                                        aria-invalid={isInvalid}
-                                        placeholder="https://example.com"
-                                        autoComplete="off"
-                                    />
-                                </FieldContent>
-                                {isInvalid && (
-                                    <FieldError>
-                                        {field.state.meta.errors?.map(
-                                            (error, index) => (
-                                                <div key={index}>{error}</div>
-                                            ),
-                                        )}
-                                    </FieldError>
-                                )}
-                            </Field>
-                        );
-                    }}
-                />
+                <div className="grid grid-cols-2 gap-4" >
+                    <form.Field
+                        name="link"
+                        children={(field) => {
+                            const isInvalid = field.state.meta.isTouched &&
+                                !field.state.meta.isValid;
+                            return (
+                                <Field data-invalid={isInvalid}>
+                                    <FieldLabel htmlFor={field.name}>
+                                        Website link
+                                    </FieldLabel>
+                                    <FieldContent>
+                                        <Input
+                                            id={field.name}
+                                            name={field.name}
+                                            value={field.state.value}
+                                            onBlur={field.handleBlur}
+                                            onChange={(e) =>
+                                                field.handleChange(
+                                                    e.target.value,
+                                                )}
+                                            aria-invalid={isInvalid}
+                                            placeholder="https://example.com"
+                                            autoComplete="off"
+                                        />
+                                    </FieldContent>
+                                    {isInvalid && (
+                                        <FieldError>
+                                            {field.state.meta.errors?.map(
+                                                (error, index) => (
+                                                    <div key={index}>
+                                                        {error}
+                                                    </div>
+                                                ),
+                                            )}
+                                        </FieldError>
+                                    )}
+                                </Field>
+                            );
+                        }}
+                    />
 
-                <form.Field
-                    name="gitHub"
-                    children={(field) => {
-                        const isInvalid = field.state.meta.isTouched &&
-                            !field.state.meta.isValid;
-                        return (
-                            <Field data-invalid={isInvalid}>
-                                <FieldLabel htmlFor={field.name}>
-                                    Github link
-                                </FieldLabel>
-                                <FieldContent>
-                                    <Input
-                                        id={field.name}
-                                        name={field.name}
-                                        value={field.state.value}
-                                        onBlur={field.handleBlur}
-                                        onChange={(e) =>
-                                            field.handleChange(e.target.value)}
-                                        aria-invalid={isInvalid}
-                                        placeholder="https://github.com/username/project"
-                                        autoComplete="off"
-                                    />
-                                </FieldContent>
-                                {isInvalid && (
-                                    <FieldError>
-                                        {field.state.meta.errors?.map(
-                                            (error, index) => (
-                                                <div key={index}>{error}</div>
-                                            ),
-                                        )}
-                                    </FieldError>
-                                )}
-                            </Field>
-                        );
-                    }}
-                />
+                    <form.Field
+                        name="gitHub"
+                        children={(field) => {
+                            const isInvalid = field.state.meta.isTouched &&
+                                !field.state.meta.isValid;
+                            return (
+                                <Field data-invalid={isInvalid}>
+                                    <FieldLabel htmlFor={field.name}>
+                                        Github link
+                                    </FieldLabel>
+                                    <FieldContent>
+                                        <Input
+                                            id={field.name}
+                                            name={field.name}
+                                            value={field.state.value}
+                                            onBlur={field.handleBlur}
+                                            onChange={(e) =>
+                                                field.handleChange(
+                                                    e.target.value,
+                                                )}
+                                            aria-invalid={isInvalid}
+                                            placeholder="https://github.com/username/project"
+                                            autoComplete="off"
+                                        />
+                                    </FieldContent>
+                                    {isInvalid && (
+                                        <FieldError>
+                                            {field.state.meta.errors?.map(
+                                                (error, index) => (
+                                                    <div key={index}>
+                                                        {error}
+                                                    </div>
+                                                ),
+                                            )}
+                                        </FieldError>
+                                    )}
+                                </Field>
+                            );
+                        }}
+                    />
+                </div>
 
                 <form.Field name="technologies">
                     {(field) => {

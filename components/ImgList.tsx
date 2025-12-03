@@ -5,10 +5,11 @@ import { IconVideoMinus } from "@tabler/icons-react";
 import { IconSquareRotatedOff, IconWashDry1, IconX } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { FileX } from "@/lib/type";
+
 import { Button } from "@/components/ui/button";
 import { File_To_FileXList } from "@/lib/file";
-import { log } from "console";
+import { cn } from "@/lib/utils"; 
+import { FileX } from "@/lib/ZodObject";
 type ImgListProps = {
     files: FileX[];
    
@@ -19,7 +20,7 @@ type ImgListProps = {
 };
 
 export default function ImgList(
-    { files, updataFiles, removeFile }: ImgListProps,
+    { files, updataFiles, removeFile , className }: ImgListProps,
 ) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -66,6 +67,8 @@ export default function ImgList(
     return (
         <Card
             onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 handleDivClick();
             }}
             onDragOver={(e) => {
@@ -87,11 +90,15 @@ export default function ImgList(
                 setIsDragOver(false);
                 setIsLoading(false);
             }}
-            className={`p-2 max-w-xl w-89 flex flex-col gap-2 rounded-lg shadow-lg  bg-white/30 dark:bg-gray-800/30 backdrop-blur-xs border border-gray-200 dark:border-gray-700 ${
+            className={ cn(+`p-2 flex flex-col gap-2 rounded-lg shadow-lg  bg-white/30 dark:bg-gray-800/30 backdrop-blur-xs border border-gray-200 dark:border-gray-700 ${
                 isDragOver
                     ? "border-dashed border-emerald-400 dark:border-emerald-600"
                     : ""
-            }`}
+
+            }`,
+            className
+        )}
+            
         >
             <input ref={fileInputRef} type="file" multiple className="hidden" onChange={GetFiles} />
             {isLoading && <div className="p-4 text-center">Loading...</div>}
@@ -187,6 +194,7 @@ function FileCard(
 
             <div className=" flex flex-row items-center ml-auto gap-2 mr-2">
                 <Button
+                  type="button"
                     variant="outline"
                     size="icon-sm"
                     onClick={() => chageFile(file)}
@@ -207,6 +215,7 @@ function FileCard(
                 </Button>
 
                 <Button
+                type="button"
                     onClick={() => removeFile(file)}
                     variant="outline"
                     size="icon-sm"

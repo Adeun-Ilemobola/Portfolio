@@ -28,10 +28,11 @@ type ToolInputProps = {
     result: string[];
     className?: string;
     maxItems?: number;
+    disabled?: boolean;
 };
 
 export default function TooLInput(
-    { onUpdate, result, className, maxItems = 6 }: ToolInputProps,
+    { onUpdate, result, className, maxItems = 6 , disabled }: ToolInputProps,
 ) {
     const [isSended, setIsSended] = useState(false);
     const [text, setText] = useState("");
@@ -60,6 +61,8 @@ export default function TooLInput(
         <InputGroup className={cn(className, "p-0.5 , gap-1")}>
             <InputGroup className="p-0.5">
                 <InputGroupInput
+                    disabled ={disabled}
+
                     type="text"
                     value={text}
                     placeholder="Enter your text here..."
@@ -73,6 +76,7 @@ export default function TooLInput(
 
                 <InputGroupAddon align="inline-end">
                     <InputGroupButton
+                            disabled ={disabled}
                         aria-label="Add"
                         title="Add"
                         size="icon-xs"

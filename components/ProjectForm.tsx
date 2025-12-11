@@ -21,9 +21,30 @@ import {
 import { toast } from "sonner";
 import { trpc as api } from "@/lib/client";
 import { useState } from "react";
+import { Spinner } from "./ui/spinner";
 
-export function ProjectForm() {
+export function ProjectForm({end}: {end: () => void}) {
     const [isLoading, setIsLoading] = useState(false);
+    const {mutateAsync , isPending} = api.CreateProject.useMutation({
+        onSuccess: () => {
+            toast.success("Project created successfully!", {
+                id: "project-created",
+            });
+            end();
+        },
+        onError: (error) => {
+            toast.error(
+                `Error creating project: ${error.message}`,
+                { id: "project-error" },
+            );
+        },
+        onMutate: () => {
+            setIsLoading(true);
+        },
+        onSettled: () => {
+            setIsLoading(false);
+        },
+    });
 
     const form = useForm({
         defaultValues: {
@@ -38,11 +59,9 @@ export function ProjectForm() {
         validators: {
             onSubmit: ProjectSchema as any,
         },
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log("Form Submitted:", values);
-            toast.success("Form submitted successfully!", {
-                id: "project-success",
-            });
+            await mutateAsync(values.value);
         },
         onSubmitInvalid: (errors) => {
             console.log("Form Submission Errors:", errors);
@@ -85,6 +104,7 @@ export function ProjectForm() {
                                         aria-invalid={isInvalid}
                                         placeholder="Login button not working on mobile"
                                         autoComplete="off"
+                                        disabled={isLoading || isPending}
                                     />
                                 </FieldContent>
                                 {isInvalid && (
@@ -114,6 +134,8 @@ export function ProjectForm() {
                                 </FieldLabel>
                                 <FieldContent>
                                     <Textarea
+                                    
+                                    
                                         id={field.name}
                                         name={field.name}
                                         value={field.state.value}
@@ -123,6 +145,7 @@ export function ProjectForm() {
                                         aria-invalid={isInvalid}
                                         placeholder="Describe the project in detail..."
                                         autoComplete="off"
+                                        disabled={isLoading || isPending}
                                     />
                                 </FieldContent>
                                 {isInvalid && (
@@ -164,6 +187,7 @@ export function ProjectForm() {
                                             aria-invalid={isInvalid}
                                             placeholder="https://example.com"
                                             autoComplete="off"
+                                            disabled={isLoading || isPending}
                                         />
                                     </FieldContent>
                                     {isInvalid && (
@@ -206,6 +230,7 @@ export function ProjectForm() {
                                             aria-invalid={isInvalid}
                                             placeholder="https://github.com/username/project"
                                             autoComplete="off"
+                                            disabled={isLoading || isPending}
                                         />
                                     </FieldContent>
                                     {isInvalid && (
@@ -238,6 +263,7 @@ export function ProjectForm() {
                                         <TooLInput
                                             result={field.state.value ?? []}
                                             onUpdate={field.handleChange}
+                                            disabled={isLoading || isPending}
                                         />
                                     </div>
                                 </FieldContent>
@@ -278,6 +304,7 @@ export function ProjectForm() {
                                         files={files}
                                         updataFiles={field.handleChange}
                                         removeFile={removeFile}
+                                        disabled={isLoading || isPending}
                                     />
                                 </div>
 
@@ -303,8 +330,8 @@ export function ProjectForm() {
                     <pre>{JSON.stringify(form.state.errors, null, 2)}</pre>
                 </div>
 
-                <Button type="submit" className="mt-4">
-                    Submit Project
+                <Button disabled={isLoading || isPending} type="submit" className="mt-4">
+                    {isLoading || isPending ? <Spinner className=" size-5 text-indigo-600/40" /> : "Save"}
                 </Button>
             </form>
         </>

@@ -18,10 +18,11 @@ type ImgListProps = {
    
     updataFiles: (files: FileX[]) => void;
     className?: string;
+    disabled?: boolean
 };
 
 export default function ImgList(
-    { files, updataFiles, removeFile , className }: ImgListProps,
+    { files, updataFiles, removeFile , className , disabled }: ImgListProps,
 ) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -44,6 +45,7 @@ export default function ImgList(
     }
 
     function makeFileMain( targetFile:FileX) {
+        if (disabled) return;
         const tempList = files.map((file) => {
             if (file === targetFile) {
                 return {
@@ -103,7 +105,7 @@ export default function ImgList(
         )}
             
         >
-            <input ref={fileInputRef} type="file" multiple className="hidden" onChange={GetFiles} />
+            <input disabled={disabled} ref={fileInputRef} type="file" multiple className="hidden" onChange={GetFiles} />
             {isLoading && <div className="p-4 text-center">Loading...</div>}
             {isDragOver && !isLoading && (
                 <div className="p-4 text-center">Drop files here</div>

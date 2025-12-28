@@ -5,7 +5,7 @@ import { PublicENV } from "./ENV";
 
 export const authClient = createAuthClient({
     /** The base URL of the server (optional if you're using the same domain) */
-    baseURL: PublicENV.NEXT_VERCEL_URL ,
+    baseURL: PublicENV.NEXT_PUBLIC_VERCEL_URL ,
     plugins: [
         magicLinkClient()
     ]

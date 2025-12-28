@@ -5,6 +5,7 @@ import { ContactIDType, ContactSchema, ProjectIDType, ProjectSchema } from '@/li
 import { projectsListViewType, State } from '@/lib/type';
 import { tr } from 'zod/v4/locales';
 import { FilesToCloud } from '@/lib/file';
+import { TRPCError } from '@trpc/server';
 
 export const appRouter = createTRPCRouter({
   // 1. Basic Echo Test
@@ -42,39 +43,53 @@ export const appRouter = createTRPCRouter({
   SendMesage: PublicBase
     .input(ContactSchema)
     .mutation(async ({ input, ctx }) => {
-      const { prisma } = ctx
-      let details: State<ContactIDType> = {
-        stateType: 'error',
-        message: 'something went wrong'
-      };
-      // send the Contactr to  me 
+      try {
+        const { prisma } = ctx
 
-      // send the Contactr to the database
-      const contact = await prisma.contact.create({
-        data: {
-          name: input.name,
-          email: input.email,
-          message: input.message,
-          company: input.company
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          message: true,
-          company: true,
+        // send the Contactr to  me 
+
+        // send the Contactr to the database
+        const contact = await prisma.contact.create({
+          data: {
+            name: input.name,
+            email: input.email,
+            message: input.message,
+            company: input.company
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            message: true,
+            company: true,
+          }
+
+        })
+
+        if (!contact) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "something went wrong",
+
+          });
+
         }
 
-      })
+        return {
+          value: contact
+        };
 
-      if (contact) {
-        details = {
-          stateType: 'success',
-          data: contact
-        }
+      } catch (error) {
+        console.log("Contact error:", error);
+        
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "something went wrong",
+
+        });
+
       }
-
-      return details;
 
     }),
 
@@ -97,12 +112,10 @@ export const appRouter = createTRPCRouter({
   CreateProject: PrivateBase
     .input(ProjectSchema)
     .mutation(async ({ input, ctx }) => {
-      const { prisma } = ctx
-      let details: State<ProjectIDType> = {
-        stateType: 'error',
-        message: 'something went wrong'
-      };
-      const  uploadedFiles = await FilesToCloud(input.files);
+      try {
+        const { prisma } = ctx
+     
+      const uploadedFiles = await FilesToCloud(input.files);
       // send the Contactr to  me 
 
       // send the Contactr to the database
@@ -113,7 +126,7 @@ export const appRouter = createTRPCRouter({
           link: input.link,
           technologies: input.technologies,
           gitHub: input.gitHub,
-          
+
           files: {
             createMany: {
               data: uploadedFiles
@@ -148,59 +161,51 @@ export const appRouter = createTRPCRouter({
 
       })
 
-      if (project) {
-        details = {
-          stateType: 'success',
-          data: project
-        }
+      if (!project) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "something went wrong",
+
+        });
+
       }
 
-      return details;
+      return {
+        value: project
+      };
+        
+      } catch (error) {
+        console.log("Project error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "something went wrong",
 
+        });
+        
+      }     
     }),
 
   getAllProject: PublicBase
     .query(async ({ ctx }) => {
       try {
-        let details: State<projectsListViewType[]> = {
-          stateType: 'error',
-          message: 'something went wrong'
-        };
+
         const { prisma } = ctx
         const projects = await prisma.project.findMany({
-          select: {
-            id: true,
-            title: true,
-            technologies: true,
-            link: true,
-            files:true,
-
+          include: {
+            files: true
           }
         })
 
-        if (projects) {
-          details = {
-            stateType: 'success',
-            data: projects.map((project) => {
-              return {
-                id: project.id,
-                title: project.title,
-                technologies: project.technologies,
-                link: project.link,
-                files: project.files.find((file) => file.type === 'image' && file.tags.includes('thumbnail_X')),
-
-              }
-            })
-          }
-        }
-
-        return details;
+        return {
+          value: projects
+        };
       } catch (error) {
 
-        return {
-          stateType: 'error',
-          message: 'something went wrong'
-        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "something went wrong",
+
+        });
 
       }
     }),

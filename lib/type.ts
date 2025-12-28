@@ -14,6 +14,7 @@ export type State<T> =
     {
         stateType: 'error';
         message: string;
+        data:null
 
     }|
     {

@@ -1,14 +1,12 @@
 "use client";
 
 import ContactSLide from "@/components/ContactSLide";
-import ImgList from "@/components/ImgList";
 import Nav from "@/components/Nav";
+import { Spinner } from "@/components/ui/spinner"
 import ProjectCard from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
-import { MOCK_PROJECTS } from "@/lib/testObject";
-import { FileX } from "@/lib/type";
 import { useState } from "react";
-import { is } from "zod/v4/locales";
+import { trpc as api } from "@/lib/client";
 
 const skills = [
   { name: "React & Next.js", category: "Frontend", size: "large" },
@@ -22,22 +20,23 @@ const skills = [
 ];
 export default function Home() {
   // const [result, setResult] = useState<string[]>([]);
-  const [files, setFiles] = useState<FileX[]>([]);
-  const [mainFile, setMainFile] = useState<FileX | null>(null);
-  const [show  , setShow] = useState(false)
+  const projects = api.getAllProject.useQuery();
+
+  const [show, setShow] = useState(false)
+
 
   return (
     <div className=" flex flex-col">
       <Nav />
-     {show &&  <ContactSLide setShowContact={setShow} showContact={show}/>}
+      {show && <ContactSLide setShowContact={setShow} showContact={show} />}
       <Button
-      variant={"secondary"}
-      className=" absolute  top-10"
-      onClick={()=>{
-        setShow(!show)
-      }}
+        variant={"secondary"}
+        className=" absolute  top-10"
+        onClick={() => {
+          setShow(!show)
+        }}
       >
-      {show ? "Hide" : "Show"}
+        {show ? "Hide" : "Show"}
 
       </Button>
       {/*  */}
@@ -139,10 +138,26 @@ export default function Home() {
         className=" min-h-screen min-w-full p-6 flex flex-col "
       >
         <h2 className=" text-3xl font-bold mb-4 ">Projects</h2>
-        <div className=" h-[90%] w-full flex flex-row overflow-y-auto flex-wrap gap-3  ">
-          {MOCK_PROJECTS.map((project, i) => (
-            <ProjectCard key={i} data={project} eidtMode={true} />
-          ))}
+        <div className={`h-[90%] w-full flex flex-row overflow-y-auto flex-wrap gap-3 ${projects.isLoading ? "justify-center items-center" : "justify-start"}  `}>
+          {projects.isLoading ? (
+            <>
+            <div className=" flex gap-1.5 justify-center items-center">
+              <Spinner className=" size-5 " />
+            </div>
+            
+            </>
+           
+          ) :
+            (
+              <>
+                {projects.data?.value.map((project, i) => (
+                  <ProjectCard key={i} data={project} eidtMode={true} />
+                ))}
+              </>
+            )
+          }
+
+
         </div>
       </section>
     </div>

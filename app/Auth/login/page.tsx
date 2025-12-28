@@ -16,9 +16,7 @@ import z from "zod";
 export default function page() {
      const { 
         data: session, 
-        isPending, //loading state
-        error, //error object
-        refetch //refetch the session
+      
     } = authClient.useSession()
     console.log("Current session:", session);
     const [LoginData, setLoginData] = React.useState({
@@ -83,18 +81,7 @@ export default function page() {
                     </InputGroupAddon>
                 </InputGroup>
 
-                {
-                    /* <InputGroup className=" overflow-hidden">
-                    <InputGroupInput className="shadow-sm" value={LoginData.password}  onChange={(e)=>{setLoginData(pre=>({...pre , password:e.target.value}))}}/>
-                    <InputGroupAddon align={"inline-start"}>
-                        <InputGroupText className="gap-0.5   ">
-                            <span className="text-[#e11d48] dark:text-[#fda4af]">
-                                *
-                            </span>Password
-                        </InputGroupText>
-                    </InputGroupAddon>
-                </InputGroup> */
-                }
+               
 
                 <Button
                     onClick={() => {

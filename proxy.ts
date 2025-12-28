@@ -9,7 +9,7 @@ const handler = toNextJsHandler(auth);
 // This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
     const session = await auth.api.getSession({
-    headers: request.headers, // equivalent to await headers() here
+    headers: request.headers, 
   });
     const  path = request.nextUrl.pathname;
     const isAuth = path==='/Auth' 

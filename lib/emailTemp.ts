@@ -1,26 +1,33 @@
-// utils/magicLinkHtml.ts
-
-export function magicLinkEmailHtml(opts: {
-  url: string;
-  token: string;
-  mode?: "light" | "dark";
-}): string {
-  const { url, token, mode = "light" } = opts;
-  const isDark = mode === "dark";
-
-  const primary =         isDark ? "#1f2937" : "#ffffff";
-  const accent =          isDark ? "#6ee7b7" : "#059669";
-  const highlight =       isDark ? "#fda4af" : "#e11d48";
-  const backgroundHex =   isDark ? "#020617" : "#e5f3ff";
-  const glassBackground = isDark ? "rgba(15,23,42,0.82)" : "rgba(255,255,255,0.82)";
-  const glassBorder =     isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(255,255,255,0.7)";
-  const shadowColor =     isDark ? "0 18px 45px rgba(15,23,42,0.8)" : "0 18px 45px rgba(15,23,42,0.18)";
-  const textPrimary =     isDark ? "#e5e7eb" : "#0f172a";
-  const textSecondary =   isDark ? "#9ca3af" : "#4b5563";
-  const subtleLine =      isDark ? "rgba(148,163,184,0.4)" : "rgba(148,163,184,0.35)";
+import { Resend } from "resend";
+import { PrivateENV } from "./ENVserver"; 
 
 
-  return `<!DOCTYPE html>
+type TemplateItems = "MagicLinkTemplate"
+
+
+function MagicLinkTemplate(opts: {
+    url: string;
+    token: string;
+    mode?: "light" | "dark";
+}): TemplateResult {
+    const { url, token, mode = "light" } = opts;
+    const isDark = mode === "dark";
+
+    const primary = isDark ? "#1f2937" : "#ffffff";
+    const accent = isDark ? "#6ee7b7" : "#059669";
+    const highlight = isDark ? "#fda4af" : "#e11d48";
+    const backgroundHex = isDark ? "#020617" : "#e5f3ff";
+    const glassBackground = isDark ? "rgba(15,23,42,0.82)" : "rgba(255,255,255,0.82)";
+    const glassBorder = isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(255,255,255,0.7)";
+    const shadowColor = isDark ? "0 18px 45px rgba(15,23,42,0.8)" : "0 18px 45px rgba(15,23,42,0.18)";
+    const textPrimary = isDark ? "#e5e7eb" : "#0f172a";
+    const textSecondary = isDark ? "#9ca3af" : "#4b5563";
+    const subtleLine = isDark ? "rgba(148,163,184,0.4)" : "rgba(148,163,184,0.35)";
+
+
+    return {
+        subject: "Sign in to ur app",
+        html: `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -48,8 +55,8 @@ export function magicLinkEmailHtml(opts: {
             border: 1px solid ${isDark ? "rgba(148,163,184,0.45)" : "rgba(148,163,184,0.3)"};
             background-color: ${isDark ? "rgba(15,23,42,0.9)" : "rgba(255,255,255,0.9)"};
             box-shadow: ${isDark
-              ? "0 10px 25px rgba(15,23,42,0.95)"
-              : "0 10px 25px rgba(15,23,42,0.12)"};
+                ? "0 10px 25px rgba(15,23,42,0.95)"
+                : "0 10px 25px rgba(15,23,42,0.12)"};
           ">
             <span style="
               font-size:11px;
@@ -116,11 +123,11 @@ export function magicLinkEmailHtml(opts: {
           border-radius:18px;
           border:1px solid ${subtleLine};
           background-color: ${isDark
-            ? "rgba(15,23,42,0.96)"
-            : "rgba(255,255,255,0.96)"};
+                ? "rgba(15,23,42,0.96)"
+                : "rgba(255,255,255,0.96)"};
           box-shadow: ${isDark
-            ? "0 12px 30px rgba(15,23,42,0.9)"
-            : "0 12px 30px rgba(15,23,42,0.1)"};
+                ? "0 12px 30px rgba(15,23,42,0.9)"
+                : "0 12px 30px rgba(15,23,42,0.1)"};
         ">
           <div style="
             font-size:11px;
@@ -203,5 +210,35 @@ export function magicLinkEmailHtml(opts: {
       </div>
     </div>
   </body>
-</html>`;
+</html>`
+    }
 }
+
+
+
+
+type TemplateParamMap = {
+    MagicLinkTemplate: {
+        url: string;
+        token: string;
+        mode?: "light" | "dark";
+    }
+}
+type TemplateResult = { subject: string; html: string }
+const templates: { [K in TemplateItems]: (params: TemplateParamMap[K]) => TemplateResult } = {
+    MagicLinkTemplate: (data) => MagicLinkTemplate({
+        url: data.url,
+        token: data.token,
+        mode: data.mode,
+
+    })
+}
+
+export function renderTemplate<K extends TemplateItems>(name: K, params: TemplateParamMap[K]): TemplateResult {
+    return templates[name](params)
+}
+export const resend = new Resend(PrivateENV.RESEND_API_KEY);
+
+
+
+

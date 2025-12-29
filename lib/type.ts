@@ -8,6 +8,7 @@ export type FileX = {
     updatedAt : Date;
     tags : string[];
     link: string;
+    mime: string;
 }
 
 export type State<T> = 

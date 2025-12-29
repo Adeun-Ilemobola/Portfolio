@@ -1,6 +1,12 @@
 import z from 'zod';
 import type { ZodType } from "zod";
 
+export const size = z.enum(["small", "medium", "large"]);
+export type SizeString = z.infer<typeof size>;
+
+export const category = z.enum(["Frontend", "Backend", "Database", "Design", "DevOps", "Language", "Game Dev", "Creative", "Media", "Tools", "Core Logic"]);  
+export type CategoryString = z.infer<typeof category>;
+
 export const ContactSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
   email: z.email({ message: "Invalid email address" }),
@@ -14,8 +20,8 @@ export type ContactIDType = z.infer<typeof ContactSchemaID>;
 
 export const SkillSchema = z.object({
   name: z.string().min(1, "Skill name cannot be empty"),
-  category: z.string().min(1, "Category cannot be empty"), 
-  size: z.enum(["small", "medium", "large"]),
+  category: category,
+  size: size,
 });
 
 export type Skill = z.infer<typeof SkillSchema>;

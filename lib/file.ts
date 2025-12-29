@@ -1,5 +1,3 @@
-import { r2 } from "./r2";
-import { PutObjectCommand } from "@aws-sdk/client-s3"
 
 import { FileX } from "./ZodObject";
 function normalizeType(file: File): FileX["type"] {
@@ -47,40 +45,5 @@ export function FileX_To_Blub(FileList: FileX[]): FileX[][] {
         }
     });
     return result;
-}
-
-export async function FilesToCloud(filesT: FileX[]): Promise<FileX[]> {
-    const filesToUpload = FileX_To_Blub(filesT);
-    const uploadedFiles: FileX[] = [];
-
-    for (const fileGroup of filesToUpload) {
-        const uploadPromises = fileGroup.map(async (file) => {
-            const filePath = `uploads/${Date.now()}-${file.name}`;
-
-            const command = new PutObjectCommand({
-                Bucket: process.env.R2_BUCKET_NAME!,
-                Key: filePath,
-                Body: Buffer.from(file.link.split(",")[1], "base64"),
-                ContentType: file.mime,
-            });
-
-            const response = await r2.send(command);
-
-            if (!response.$metadata.httpStatusCode?.toString().startsWith("2")) {
-                throw new Error("Failed to upload file to R2");
-            }
-
-            return {
-                ...file,
-                path: filePath,
-                link: `${process.env.R2_PUBLIC_BASE_URL}/${filePath}`,
-            };
-        });
-
-        const uploadedGroup = await Promise.all(uploadPromises);
-        uploadedFiles.push(...uploadedGroup);
-    }
-
-    return uploadedFiles;
 }
 

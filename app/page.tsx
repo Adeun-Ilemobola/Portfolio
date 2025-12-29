@@ -7,20 +7,25 @@ import ProjectCard from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { trpc as api } from "@/lib/client";
+import SkillCard from "@/components/SkillCard";
+import { Skill } from "@/lib/ZodObject";
 
-const skills = [
-  { name: "React & Next.js", category: "Frontend", size: "large" },
-  { name: "TypeScript", category: "Language", size: "small" },
-  { name: "Express & Hono", category: "Backend", size: "medium" },
-  { name: "C++", category: "Core Logic", size: "small" },
-  { name: "Prisma & Drizzle", category: "Database", size: "medium" },
-  { name: "Photography", category: "Creative", size: "small" },
-  { name: "Adobe Suite", category: "Design", size: "small" },
-  { name: "A/V Production", category: "Media", size: "large" },
+const skills: Skill[] = [
+  {  name: "React", category: "Frontend", size: "large" },
+  { name: "Next.js", category: "Frontend", size: "large" },
+  { name: "TypeScript", category: "Language", size: "large" },
+  { name: "JavaScript", category: "Language", size: "medium" },
+  { name: "Tailwind CSS", category: "Frontend", size: "medium" },
+  { name: "Node.js", category: "Backend", size: "medium" },
+  { name: "Express", category: "Backend", size: "small" },
+  { name: "Prisma", category: "Database", size: "small" },
+  { name: "Git", category: "Tools", size: "small" },
+  { name: "Figma", category: "Design", size: "small" },
 ];
 export default function Home() {
   // const [result, setResult] = useState<string[]>([]);
   const projects = api.getAllProject.useQuery();
+  const sills = api.getSills.useQuery();
 
   const [show, setShow] = useState(false)
 
@@ -75,58 +80,15 @@ export default function Home() {
 
         {/* The Grid Container */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl w-full px-4">
-          {skills.map((skill, index) => (
-            <div
-              key={index}
-              className={`
-              relative group overflow-hidden rounded-2xl border 
-              transition-all duration-500 ease-out
-              flex flex-col justify-center items-start p-6
-              
-              /* Glassmorphism Surface & Blur (2px-5px range) */
-              bg-[#ffffff]/60 backdrop-blur-[4px] border-white/60 shadow-sm
-              hover:bg-[#ffffff]/80 hover:border-white hover:shadow-lg hover:scale-[1.02]
-              
-              /* Dark Mode Overrides */
-              dark:bg-[#1f2937]/40 dark:backdrop-blur-[4px] dark:border-white/10 dark:shadow-none
-              dark:hover:bg-[#1f2937]/60 dark:hover:border-white/30 dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]
-
-              /* Layout Sizing */
-              ${skill.size === "large" ? "col-span-2 row-span-2" : ""}
-              ${skill.size === "medium" ? "col-span-2 row-span-1" : ""}
-              ${skill.size === "small" ? "col-span-1 row-span-1" : ""}
-            `}
-            >
-              {/* The "Twist": Orb using Highlight Token */}
-              <div className="absolute -right-10 -top-10 w-24 h-24 rounded-full blur-xl transition-colors duration-500
-              bg-[#e11d48]/10 group-hover:bg-[#e11d48]/20
-              dark:bg-[#fda4af]/10 dark:group-hover:bg-[#fda4af]/20
-            ">
-              </div>
-
-              {/* Category Label: Using Accent Token */}
-              <span className="text-xs font-mono mb-2 uppercase tracking-wider z-10
-              text-[#059669] 
-              dark:text-[#6ee7b7]
-            ">
-                {skill.category}
-              </span>
-
-              {/* Skill Name: High Contrast */}
-              <h3 className="text-xl md:text-2xl font-bold z-10
-              text-gray-800 
-              dark:text-white
-            ">
-                {skill.name}
-              </h3>
-
-              {/* Decorative Line: Using Highlight Token */}
-              <div className="h-1 mt-3 rounded-full transition-all duration-500 w-8 group-hover:w-full
-              bg-[#e11d48]/60
-              dark:bg-[#fda4af]/60
-            ">
-              </div>
-            </div>
+          {sills.data?.value.map((skill, index) => (
+          <SkillCard key={index}
+           skill={
+            {
+              name: skill.name,
+              category: skill.category as Skill["category"],
+              size: skill.size,
+            }
+           } />
           ))}
         </div>
       </section>

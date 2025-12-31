@@ -16,7 +16,6 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { da } from "zod/v4/locales";
 
 type ProjectCardProps = {
     data: ProjectType;

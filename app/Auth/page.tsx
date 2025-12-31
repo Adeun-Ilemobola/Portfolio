@@ -1,8 +1,6 @@
 
 "use client"
 import AuthSel from "@/components/AuthSel";
-import { motion , Variants } from "framer-motion";
-import Link from "next/link";
 
 export default function GlassSpaceMenu() {
   

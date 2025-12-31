@@ -36,7 +36,7 @@ const AVAILABLE_SKILLS: Omit<Skill, 'size'>[] = [
   { name: "Python", category: "Language" },
   { name: "Unreal Engine", category: "Game Dev" },
   { name: "Three.js", category: "Frontend" },
-  { name: "Vite", category: "Build Tool" }
+  { name: "Vite", category: "Frontend" },
 ];
 
 // 2. New function to generate random unique skills with random sizes

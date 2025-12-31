@@ -13,7 +13,6 @@ import { IconBrandJavascript, IconCornerDownLeft, IconX } from '@tabler/icons-re
 import { Button } from './ui/button';
 import { ContactSchema, ContactType } from '@/lib/ZodObject';
 import { toast } from 'sonner';
-import { log } from 'console';
 
 type Props = {
   setShowContact: React.Dispatch<React.SetStateAction<boolean>>,

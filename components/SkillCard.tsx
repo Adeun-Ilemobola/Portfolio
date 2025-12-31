@@ -1,5 +1,4 @@
 import { Skill } from '@/lib/ZodObject'
-import React from 'react'
 
 export default function SkillCard({ skill }: { skill: Skill }) {
     return (

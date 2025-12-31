@@ -14,13 +14,13 @@ export async function proxy(request: NextRequest) {
     const  path = request.nextUrl.pathname;
     const isAuth = path==='/Auth' 
     const isLogin = path.startsWith('/Auth/login')
-    console.log("[PROXY] incoming request:", {
-    url: request.url,
-    pathname: request.nextUrl.pathname,
-    searchParams: Object.fromEntries(request.nextUrl.searchParams.entries()),
-    cookies: request.cookies.getAll().map(c => ({ name: c.name, value: c.value })),
-    session
-  });
+  //   console.log("[PROXY] incoming request:", {
+  //   url: request.url,
+  //   pathname: request.nextUrl.pathname,
+  //   searchParams: Object.fromEntries(request.nextUrl.searchParams.entries()),
+  //   cookies: request.cookies.getAll().map(c => ({ name: c.name, value: c.value })),
+  //   session
+  // });
 
 
   

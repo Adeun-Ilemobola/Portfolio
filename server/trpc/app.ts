@@ -17,10 +17,7 @@ export const appRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       try {
         const { prisma } = ctx
-
-        // send the Contactr to  me 
-
-        // send the Contactr to the database
+        console.log("payLoad ==>" ,input);
         const contact = await prisma.contact.create({
           data: {
             name: input.name,
@@ -39,22 +36,19 @@ export const appRouter = createTRPCRouter({
         })
 
         if (!contact) {
+          log("Failed to create contact:", contact);
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "something went wrong",
 
           });
-
         }
-
         return {
           value: contact
         };
 
       } catch (error) {
         console.log("Contact error:", error);
-        
-
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "something went wrong",
@@ -69,14 +63,6 @@ export const appRouter = createTRPCRouter({
     .query(async ({ ctx }) => {
       const { prisma } = ctx
       const contact = await prisma.contact.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          message: true,
-          company: true,
-          createdAt: true
-        }
       })
       return contact;
     }),

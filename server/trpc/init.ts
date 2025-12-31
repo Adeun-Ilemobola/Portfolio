@@ -37,11 +37,6 @@ const NotAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const PublicBase = t.procedure.use(NotAuthed);
-
-
-
-
-
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;

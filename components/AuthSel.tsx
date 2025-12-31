@@ -1,7 +1,9 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState , useEffect } from 'react'
 import { trpc as api } from '@/lib/client';
-import { motion, Variants } from "framer-motion";
+
+import { IconBuilding, IconMail, IconHash, IconCopy } from '@tabler/icons-react';
+import { motion } from "framer-motion";
 import {
   Field,
   FieldDescription,
@@ -22,11 +24,12 @@ import {
   DialogOverlay
 } from "@/components/ui/dialog"
 import { ProjectForm } from './ProjectForm';
-import { category, CategoryString, size, Skill, SkillSchema } from '@/lib/ZodObject';
+import { category, CategoryString, ContactIDType, size, Skill, SkillSchema } from '@/lib/ZodObject';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Spinner } from './ui/spinner';
 import { Input } from './ui/input';
+import { set } from 'better-auth';
 export default function AuthSel() {
   const [sel, setSel] = React.useState<"newProject" | "newSkill" | "newMessage" | null>(null);
   const [open, setOpen] = React.useState(false);
@@ -344,7 +347,152 @@ function SkillView({ Finish }: { Finish: () => void }) {
 }
 
 function NewMessage({ Finish }: { Finish: () => void }) {
+  const fetchMessages = api.getALlSendMesage.useQuery(undefined , {
+    refetchOnWindowFocus: false,
+  });
+  const [searchTerm , setSearchTerm] = useState<string>("");
+  const [messages , setMessages] = useState<ContactIDType[]>([]);
+  useEffect(() => {
+    if(fetchMessages.data){
+      setMessages( fetchMessages.data);
+    }
+  } , [fetchMessages.data]);
+
+
+  function filter() {
+    if (searchTerm.trim() === "") {
+      setMessages(fetchMessages.data || []);
+      return;
+    }
+    const filtered = fetchMessages.data?.filter((msg) => 
+      msg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      msg.email.toLowerCase().includes(searchTerm.toLowerCase()) 
+    ) || [];
+    setMessages(filtered);
+    setSearchTerm("");
+    
+  }
+
   return (
-    <div>New Message View</div>
+    <div className=' flex flex-col gap-1'>
+      <h1>All Messages</h1>
+      <div className=' flex flex-row-reverse gap-2'>
+        <Input placeholder='Search' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <Button onClick={filter}>Filter</Button>
+      </div>
+      <div className=' p-1 flex flex-col gap-2 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 scrollbar-thumb-rounded scrollbar-track-rounded'>
+        {fetchMessages.isLoading && (
+          <div className=' flex flex-1 justify-center items-center'>
+            <Spinner className=' size-9' />
+          </div>
+        )}
+        {
+          !fetchMessages.isLoading && messages.length === 0 && (
+            <div className=' flex-1 text-3xl text-center py-10 text-gray-500'>
+              No Messages Found.
+            </div>
+          )
+        }
+        {
+          !fetchMessages.isLoading && messages.map((msg , i) => (
+            <ContactCard key={i} id={msg.id} name={msg.name} email={msg.email} message={msg.message} company={msg.company} />
+          ))
+        } 
+
+      </div>
+    </div>
+  )
+}
+
+function ContactCard({ name, id, email, message, company }: ContactIDType) {
+  
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className='
+        group relative
+        flex flex-col gap-4 
+        p-5 rounded-2xl
+        bg-white dark:bg-gray-900 
+        border border-gray-200 dark:border-gray-800
+        hover:border-gray-300 dark:hover:border-gray-700
+        shadow-sm hover:shadow-md
+        transition-all duration-200
+      '
+    >
+      {/* Header Section */}
+      <div className='flex flex-row justify-between items-start gap-4'>
+        
+        {/* User Info */}
+        <div className='flex flex-col gap-1'>
+          <h3 className='font-bold text-lg text-gray-900 dark:text-gray-100 tracking-tight leading-none'>
+            {name}
+          </h3>
+          
+          <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500 dark:text-gray-400 mt-1'>
+            
+            {/* Email with copy */}
+            <button 
+              onClick={() => copyToClipboard(email)}
+              className='flex items-center gap-1 hover:text-gray-800 dark:hover:text-gray-200 transition-colors'
+              title="Copy Email"
+            >
+              <IconMail size={14} />
+              {email}
+            </button>
+
+            {company && (
+              <>
+                <span className='hidden sm:inline text-gray-300 dark:text-gray-700'>|</span>
+                <div className='flex items-center gap-1'>
+                  <IconBuilding size={14} />
+                  {company}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ID Badge */}
+        <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-xs font-mono text-gray-500'>
+          <IconHash size={12} className="opacity-50"/>
+          {id.slice(0, 8)}...
+        </div>
+      </div>
+
+      {/* Message Body - Styled like code block to match input form */}
+      <div className='relative'>
+        <div className='
+          p-4 rounded-xl 
+          bg-gray-50 dark:bg-black/30 
+          border border-gray-100 dark:border-white/5
+          text-sm text-gray-700 dark:text-gray-300
+          font-mono leading-relaxed
+        '>
+           {/* Visual "quote" marker */}
+           <div className="absolute top-4 left-0 w-1 h-8 bg-[#059669] rounded-r-full" />
+           {message}
+        </div>
+      </div>
+
+      {/* Hover Action (Optional - e.g. Reply) */}
+      <div className='absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity'>
+         <button 
+           onClick={() => copyToClipboard(message)}
+           className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+         >
+           <IconCopy size={16} />
+         </button>
+      </div>
+
+    </motion.div>
   )
 }

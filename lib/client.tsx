@@ -7,7 +7,7 @@ import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import { useState } from 'react';
 import { makeQueryClient } from './query-client';
-import type { AppRouter } from '@/server/trpc/app'; 
+import type { AppRouter } from '@/server/trpc/app';
 import { PublicENV } from './ENV';
 export const trpc = createTRPCReact<AppRouter>();
 let clientQueryClientSingleton: QueryClient;
@@ -25,14 +25,17 @@ export function TRPCProvider(
     children: React.ReactNode;
   }>,
 ) {
- 
+
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
-           transformer: superjson, 
-          url: `${PublicENV.NEXT_PUBLIC_VERCEL_URL}/api/trpc`,
+          transformer: superjson,
+          url: `${typeof window !== "undefined"
+              ? "" 
+              : PublicENV.NEXT_PUBLIC_VERCEL_URL 
+            }/api/trpc`,
         }),
       ],
     }),

@@ -52,7 +52,7 @@ export default function Home() {
       >
         <h1 className="text-5xl font-bold">About Me</h1>
 
-        <p className="mt-4 text-lg max-w-2xl text-center">
+        <p className="mt-4 text-xl max-w-2xl text-center">
           Hello! I’m Adeun Ilemobola, a Junior Web and Multimedia Developer
           based in Surrey, BC. I have a passion for bridging the gap between
           functional code and engaging visual content. My technical toolkit is
@@ -60,7 +60,7 @@ export default function Home() {
           React and Next.js, alongside back-end proficiency in Express and Hono.
         </p>
 
-        <p className="mt-4 text-lg max-w-2xl text-center">
+        <p className="mt-4 text-xl max-w-2xl text-center">
           Currently completing my Associate of Science at Douglas College, I am
           driven by a curiosity for how things work—from high-level database
           management with Prisma and Drizzle to the logic of C++ Beyond the
